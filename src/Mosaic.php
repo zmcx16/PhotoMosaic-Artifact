@@ -43,9 +43,18 @@ class Mosaic {
         return $this->save();
     }
 
+	private function resize_imagejpeg($file, $w, $h) {
+       list($width, $height) = getimagesize($file);
+       $src = imagecreatefromjpeg($file);
+       $dst = imagecreatetruecolor($w, $h);
+       imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $width, $height);
+       return $dst;
+    }
+	
     // makes sure all resources are ready and valid
     private function prepare() {
-        $this->input['img']    = imagecreatefromjpeg($this->input_filename);
+        //$this->input['img']    = imagecreatefromjpeg($this->input_filename);
+		$this->input['img']    = $this->resize_imagejpeg($this->input_filename, 4000, 5800);
         $this->input['width']  = imagesx($this->input['img']);
         $this->input['height'] = imagesy($this->input['img']);
 
