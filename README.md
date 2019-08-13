@@ -3,6 +3,7 @@
 
 # Concept
 The photo mosaic algorithm is based on [eflorit / mosaic-generator (php)](https://https://github.com/eflorit/mosaic-generator) and implements it on python language. 
+
 Besides, I also make some interesting features on this tool, I hope the PhotoMosaic-Artifact can help you to make some amazing & exciting photos :) 
 
 # Features
@@ -17,6 +18,7 @@ Besides, I also make some interesting features on this tool, I hope the PhotoMos
   * Linux   - Ubuntu 16.04+
   
   P.S. 
+  
   The Pyinstaller builds is not fully static([issue](https://stackoverflow.com/questions/17654363/pyinstaller-glibc-2-15-not-found)), if your OS is not compatible with PhotoMosaic-Artifact, please just run it on source code instead of executble package.
 
   
@@ -29,25 +31,29 @@ From command line:
 ```
 python photomosaic-core.py -img sample.jpg -row 145 -col 100 -scale 10 -out output_sample -gap 4 -e 0 [--no-thumbs]
 
--img                  			path to the original picture that shall be recreated
--row                    		number of thumbnails to create per row
+-img                            path to the original picture that shall be recreated
+-row                            number of thumbnails to create per row
 -col               				number of thumbnails to create per column
--scale		(default = 1)		output image size = input image size * scale
---no-thumbs (default = false)  	won't (re)generate thumbnails before creating mosaic
--out 		(optional)			output file name
--gap 		(default = 4)		the min distance with same thumbnails image
--e			(default = 27)		enhance colors with original image (0~100%)
--f			(default = "")		use filter for creating thumbnails
+-scale      (default = 1)       output image size = input image size * scale
+--no-thumbs (default = false)   won't (re)generate thumbnails before creating mosaic
+-out        (optional)          output file name
+-gap        (default = 4)       the min distance with same thumbnails image
+-e          (default = 27)      enhance colors with original image (0~100%)
+-f          (default = "")      use filter for creating thumbnails
 ```
 
   
-# Demo sample1 ([org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1.jpg))
+# Demo sample1 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1.jpg))
+
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample1.jpg)
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1-demo.jpg)
 
-# Demo sample1 ([org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output2.jpg))
+
+
+# Demo sample2 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output2.jpg))
+
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample2.jpg)
 
