@@ -138,6 +138,7 @@ class PhotoMosaicCore(object):
                 display_progress = now_progress
                 sys.stdout.write("\rprogress: {:.0f}%".format(display_progress))
 
+        sys.stdout.write("\rprogress: 100%")
         print()
         if self.tgt_img_filename:
             tgt_im.save(self.tgt_img_filename+'.jpg', format='JPEG', subsampling=0, quality=100)
@@ -283,14 +284,14 @@ class PhotoMosaicCore(object):
 if __name__ == "__main__":
     """
     core = PhotoMosaicCore(
-        "sample.jpg",
-        125,
-        236,
-        scale=2,
+        "sample2.jpg",
+        96,
+        128,
+        scale=10,
+        min_space_same_thumb=4,
         gen_thumbs=True)
     core.generate_mosaic()
     """
-
     parser = argparse.ArgumentParser()
     parser.add_argument("-img", "--input-image", dest="img", required=True, help="input image path")
     parser.add_argument("-row", dest="row", required=True, help="number of thumbnails to create per row")
@@ -299,7 +300,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-thumbs", dest="gen_thumbs", action='store_false', help="won't (re)generate thumbnails before creating mosaic")
     parser.add_argument("-out", "--output-name", dest="tgt_img_filename", default="", help="output file name")
     parser.add_argument("-gap", dest="min_space_same_thumb", default=4, help="the min distance with same thumbnails image")
-    parser.add_argument("-e", "-enhance-colors", dest="enhance_colors", default=27, help="enhance colors with original image")
+    parser.add_argument("-e", "-enhance-colors", dest="enhance_colors", default=27, help="enhance colors with original image (0~100%)")
     parser.add_argument("-f", "-thumbs_filter", dest="thumbs_filter", default="", help="use filter for creating thumbnails")
     args = parser.parse_args()
 
@@ -315,4 +316,3 @@ if __name__ == "__main__":
         args.thumbs_filter)
 
     core.generate_mosaic()
-
