@@ -27,9 +27,14 @@ Besides, I also make some interesting features on this tool, I hope the PhotoMos
 
 
 # Usage
-From command line:
+1. Copy your material image files into material folder
+2. Follow below command line:
 ```
-python photomosaic-core.py -img sample.jpg -row 145 -col 100 -scale 10 -out output_sample -gap 4 -e 0 [--no-thumbs]
+python photomosaic-core.py -img {input path} -row {int} -col {int} -scale {float} -out {output file name} -gap {int} -e {int} [--no-thumbs]
+
+or
+
+photomosaic-core.exe -img sample.jpg -row 145 -col 100 -scale 10 -out output_sample -gap 4 -e 27
 
 -img                            path to the original picture that shall be recreated
 -row                            number of thumbnails to create per row
