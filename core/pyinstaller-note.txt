@@ -1,0 +1,1 @@
+pyinstaller -F photomosaic-core.py --add-binary C:\Users\zmcx16\AppData\Local\Programs\Python\Python36\envs\py36-pa-build\Lib\site-packages\cv2\opencv_ffmpeg410_64.dll;.

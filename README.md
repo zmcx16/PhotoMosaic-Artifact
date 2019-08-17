@@ -50,7 +50,11 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 --no-thumbs (default = false)           won't (re)generate thumbnails before creating mosaic
 ```
 
-  
+# Note
+1. The output image size (input image size * scale) must be divisible by row and col, the width must divisible by column; the height must divisible by row.
+2. The thumbnail image size = (input-image's width * scale / col, input-image's height * scale / row), if the aspect ratio of images in the material folder is different from the thumbnail, the image will be cropped to fit the aspect ratio of the thumbnail.
+
+
 # Demo sample1 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1.jpg))
 
 

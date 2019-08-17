@@ -8,6 +8,7 @@ import hashlib
 from timeit import default_timer as timer
 from datetime import timedelta
 import random
+import ctypes
 
 from PIL import Image
 import numpy as np
@@ -251,9 +252,9 @@ class PhotoMosaicCore(object):
             now_progress = math.ceil(i * 100 / total)
             if now_progress != display_sub_progress:
                 display_sub_progress = now_progress
-                sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]".format(progress, display_sub_progress))
+                sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]     ".format(progress, display_sub_progress))
 
-        sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]".format(progress, 100))
+        sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]     ".format(progress, 100))
         video.release()
 
 
