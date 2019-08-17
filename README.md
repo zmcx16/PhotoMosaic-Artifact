@@ -32,17 +32,15 @@ Besides, I also make some interesting features on this tool, I hope the PhotoMos
 2. Follow below command line:
 ```
 python photomosaic-core.py -i {input path} -r {int} -c {int} -m {material folder path} -s {float} -vs {int} -o {output file name} -g {int} -e {int} -t {float} -seed {int} [--no-thumbs]
-
 or
-
 photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 -i                              		path to the original picture that shall be recreated
 -r                              		number of thumbnails to create per row
--c               						number of thumbnails to create per column
--m			(default = ".\material")	path to the material folder
+-c                                      number of thumbnails to create per column
+-m          (default = ".\material")    path to the material folder
 -s          (default = 1)       		output image size = input image size * scale
--vs			(default = 5000)    		sampling video image interval (ms), only need be set if the material include video files
+-vs         (default = 5000)            sampling video image interval (ms), only need be set if the material include video files
 -o          (optional)          		output file name
 -gap        (default = 4)       		the min distance with same thumbnails image
 -e          (default = 27)				enhance colors with original image (0~100%)
