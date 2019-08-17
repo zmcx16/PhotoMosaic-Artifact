@@ -8,7 +8,7 @@ Besides, I also make some interesting features on this tool, I hope the PhotoMos
 
 # Features
 1. Make the custom photographic mosaic image
-2. Support video material (TODO)
+2. Support video material
 3. Support GUI tool (TODO)
 
 
@@ -24,27 +24,32 @@ Besides, I also make some interesting features on this tool, I hope the PhotoMos
   
 # Requirements
   *  Pillow>=6.1.0
-
+  *  numpy>=1.17.0
+  *  opencv-python>=4.1.0.25
 
 # Usage
 1. Copy your material image files into material folder
 2. Follow below command line:
 ```
-python photomosaic-core.py -img {input path} -row {int} -col {int} -scale {float} -out {output file name} -gap {int} -e {int} [--no-thumbs]
+python photomosaic-core.py -i {input path} -r {int} -c {int} -m {material folder path} -s {float} -vs {int} -o {output file name} -g {int} -e {int} -t {float} -seed {int} [--no-thumbs]
 
 or
 
-photomosaic-core.exe -img sample.jpg -row 145 -col 100 -scale 10 -out output_sample -gap 4 -e 27
+photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
--img                            path to the original picture that shall be recreated
--row                            number of thumbnails to create per row
--col               				number of thumbnails to create per column
--scale      (default = 1)       output image size = input image size * scale
---no-thumbs (default = false)   won't (re)generate thumbnails before creating mosaic
--out        (optional)          output file name
--gap        (default = 4)       the min distance with same thumbnails image
--e          (default = 27)      enhance colors with original image (0~100%)
--f          (default = "")      use filter for creating thumbnails
+-i                              		path to the original picture that shall be recreated
+-r                              		number of thumbnails to create per row
+-c               						number of thumbnails to create per column
+-m			(default = ".\material")	path to the material folder
+-s          (default = 1)       		output image size = input image size * scale
+-vs			(default = 5000)    		sampling video image interval (ms), only need be set if the material include video files
+-o          (optional)          		output file name
+-gap        (default = 4)       		the min distance with same thumbnails image
+-e          (default = 27)				enhance colors with original image (0~100%)
+-f          (default = "")      		use filter for creating thumbnails
+-t          (default = 0)      			set tolerance and seed args can generate different photo mosaic even the material images are the same
+-seed       (default = 0)      			random seed, using it on video image sampling and choose thumbs image
+--no-thumbs (default = false)   		won't (re)generate thumbnails before creating mosaic
 ```
 
   

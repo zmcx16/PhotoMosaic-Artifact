@@ -7,25 +7,36 @@ import argparse
 import hashlib
 from timeit import default_timer as timer
 from datetime import timedelta
+import random
 
-from PIL import Image, ImageStat
+from PIL import Image
+import numpy as np
+import cv2
 
 
 class PhotoMosaicCore(object):
 
+    # hidden configure
+    # rgb_weight = {'r': 0.65, 'g': 0.794, 'b': 0.557}
+    rgb_weight = {'r': 1, 'g': 1, 'b': 1}
+
+    # configure
     thumbs_dir = os.path.join(".", "thumbnails")
     material_dir = os.path.join(".", "material")
     thumbs_info_path = os.path.join(".", "thumbs_info.json")
-    min_space_same_thumb = 4  # prevents  use for 2 thumbs around a same area
-    enhance_colors = 27  # % or false(0)
-    thumbs_filter = None
+    output_path = os.path.join(".", "output")
 
     src_img_path = ''
     row = 0
     col = 0
     scale = 1.0
+    video_sampling_ms = 5000
     gen_thumbs = True
     tgt_img_filename = ''
+    min_space_same_thumb = 4  # prevents  use for 2 thumbs around a same area
+    enhance_colors = 27  # % or false(0)
+    tolerance = 0
+    thumbs_filter = None
 
     input = {}
     output = {}
@@ -36,23 +47,32 @@ class PhotoMosaicCore(object):
     def __init__(
             self,
             src_img_path,
+            material_dir,
             row,
             col,
             scale=1.0,
+            video_sampling_ms=5000,
             gen_thumbs=True,
             tgt_img_filename='',
             min_space_same_thumb=4,
             enhance_colors=27,
+            tolerance=0,
+            seed=0,
             thumbs_filter=''):
 
         self.src_img_path = src_img_path
+        if material_dir != '':
+            self.material_dir = material_dir
         self.row = row
         self.col = col
         self.scale = scale
+        self.video_sampling_ms = video_sampling_ms
         self.gen_thumbs = gen_thumbs
         self.tgt_img_filename = tgt_img_filename
         self.min_space_same_thumb = min_space_same_thumb
         self.enhance_colors = enhance_colors
+        self.tolerance = tolerance
+        random.seed(seed)
         self.thumbs_filter = thumbs_filter
 
         self.matrix = [[0] * self.col for _ in range(self.row)]
@@ -70,13 +90,13 @@ class PhotoMosaicCore(object):
 
     def __prepare(self):
 
-        im = Image.open(self.src_img_path)
-        self.input['img'] = im.resize(
-            ((int)(im.size[0] * self.scale), (int)(im.size[1] * self.scale)))
+        img = Image.open(self.src_img_path)
+        self.input['img'] = img.resize(
+            ((int)(img.size[0] * self.scale), (int)(img.size[1] * self.scale)))
         self.input['width'] = self.input['img'].size[0]
         self.input['height'] = self.input['img'].size[1]
 
-        print('output image size {0} * {1} = {2}'.format(im.size,
+        print('output image size {0} * {1} = {2}'.format(img.size,
                                                          self.scale, self.input['img'].size))
 
         if self.input['width'] % self.col != 0:
@@ -98,6 +118,9 @@ class PhotoMosaicCore(object):
         if not os.path.exists(self.thumbs_dir):
             os.makedirs(self.thumbs_dir)
 
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
+
         if self.gen_thumbs:
             self.__gen_thumbs()
         else:
@@ -107,11 +130,13 @@ class PhotoMosaicCore(object):
 
     def __generate(self):
 
+        print('Generating photo mosaic image...')
+
         display_progress = 0
         sys.stdout.write("\rprogress: {:.0f}%".format(display_progress))
         total = self.row * self.col
 
-        tgt_im = Image.new('RGB', (self.input['width'], self.input['height']))
+        tgt_img = Image.new('RGB', (self.input['width'], self.input['height']))
         for i in range(self.row):
             for j in range(self.col):
                 # left, up, right, bottom
@@ -120,18 +145,18 @@ class PhotoMosaicCore(object):
                           (j+1)*self.cell['width'],
                           (i+1)*self.cell['height'])
 
-                crop_im = self.input['img'].crop(region)
-                r, g, b = self.__ave_color(crop_im)
+                crop_img = self.input['img'].crop(region)
+                r, g, b = self.__avg_color(crop_img)
                 file_name = self.__get_filename_for_closest_color((r, g, b), i, j)
                 cell_path = os.path.join(self.thumbs_dir, file_name)
-                cell_im = Image.open(cell_path).convert('RGB')
+                cell_img = Image.open(cell_path).convert('RGB')
 
                 if self.enhance_colors != 0:
                     alpha = (int)(self.enhance_colors / 100.0 * 255)
-                    tweak_im = Image.new('RGBA', (self.cell['width'], self.cell['height']), (r, g, b, alpha))
-                    cell_im.paste(tweak_im, (0, 0, self.cell['width'], self.cell['height']), tweak_im)
+                    tweak_img = Image.new('RGBA', (self.cell['width'], self.cell['height']), (r, g, b, alpha))
+                    cell_img.paste(tweak_img, (0, 0, self.cell['width'], self.cell['height']), tweak_img)
 
-                tgt_im.paste(cell_im, region)
+                tgt_img.paste(cell_img, region)
 
             now_progress = math.ceil(i * self.col / total * 100)
             if now_progress != display_progress:
@@ -141,14 +166,14 @@ class PhotoMosaicCore(object):
         sys.stdout.write("\rprogress: 100%")
         print()
         if self.tgt_img_filename:
-            tgt_im.save(self.tgt_img_filename+'.jpg', format='JPEG', subsampling=0, quality=100)
+            tgt_img.save(os.path.join(self.output_path, self.tgt_img_filename+'.jpg'), format='JPEG', subsampling=0, quality=100)
         else:
-            tgt_im.save('output_{0}.jpg'.format(time.perf_counter()), format='JPEG', subsampling=0, quality=100)
+            tgt_img.save(os.path.join(self.output_path, 'output_{0}.jpg'.format(time.perf_counter())), format='JPEG', subsampling=0, quality=100)
 
     # (re)generates thumbnails and determines average color for each image
     def __gen_thumbs(self):
 
-        print('Regenerating thumbnails... This may take up to a few minutes.')
+        print('Generating thumbnails...')
 
         # clear thumbs files
         for the_file in os.listdir(self.thumbs_dir):
@@ -167,39 +192,89 @@ class PhotoMosaicCore(object):
         if len(material_list) == 0:
             raise Exception('No photos to process in ', self.material_dir)
 
-        for file in material_list:
+        display_progress = 0
+        sys.stdout.write("\rprogress: {:.0f}%".format(display_progress))
+        total = len(material_list)
+
+        for idx, file in enumerate(material_list):
             sub_ext = file[-4:]
             if (sub_ext.endswith('.jpg') or
-                sub_ext.endswith('jpeg') or
-                sub_ext.endswith('.png') or
-                sub_ext.endswith('.gif') or
+                    sub_ext.endswith('jpeg') or
+                    sub_ext.endswith('.png') or
+                    sub_ext.endswith('.gif') or
                     sub_ext.endswith('.bmp')):
+                self.__img2thumbnail(Image.open(file))
+            elif (sub_ext.endswith('.mkv') or
+                    sub_ext.endswith('.avi') or
+                    sub_ext.endswith('.mp4')):
+                self.__gen_thumbs_from_videos(file, display_progress)
 
-                im = Image.open(file)
-                region = self.__get_crop_region(im.size[0], im.size[1], self.cell['width'], self.cell['height'])
-                im = im.crop(region)
-                im.thumbnail((self.cell['width'], self.cell['height']), Image.ANTIALIAS)
+            now_progress = math.ceil(idx * 100 / total)
+            if now_progress != display_progress:
+                display_progress = now_progress
+                sys.stdout.write("\rprogress: {:.0f}%       ".format(display_progress))
 
-                if self.thumbs_filter and self.thumbs_filter.lower() == 'antialias':
-                    im.thumbnail((self.cell['width'], self.cell['height']), Image.ANTIALIAS)
-                else:
-                    im.thumbnail((self.cell['width'], self.cell['height']))
-
-                im = im.crop((0, 0, self.cell['width'], self.cell['height']))
-
-                file_name = '{0}{1}'.format(file, time.perf_counter())
-                file_name = hashlib.md5(file_name.encode('utf-8')).hexdigest() + '.jpg'
-                im_rgb = im.convert('RGB')
-                im_rgb.save(os.path.join(self.thumbs_dir, file_name))
-
-                r, g, b = self.__ave_color(im_rgb)
-                self.thumbs_info[file_name] = {'r': r, 'g': g, 'b': b}
-
+        sys.stdout.write("\rprogress: 100%      ")
+        print()
         # save thumbs_info.json
         with open(self.thumbs_info_path, 'w') as f:
             json.dump(self.thumbs_info, f)
 
         print('Generate thumbnails completed.')
+
+    def __gen_thumbs_from_videos(self, file, progress):
+
+        video = cv2.VideoCapture(file)
+        total = video.get(cv2.CAP_PROP_FRAME_COUNT)
+        fps = video.get(cv2.CAP_PROP_FPS)
+
+        display_sub_progress = 0
+
+        step = (int)(fps * self.video_sampling_ms / 1000)
+        for i in range(step, int(total), int(step)):
+            try:
+                offset = random.randrange(step)
+                video.set(cv2.CAP_PROP_POS_FRAMES, i - offset)
+                video.grab()
+            except Exception as e:
+                print(e)
+
+            ret, frame = video.read()
+            if not ret:
+                continue
+
+            f_mean = np.mean(frame, axis=(0, 1))
+            if (f_mean > [10, 10, 10]).all() and (f_mean < [245, 245, 245]).all():  # filter pure black or white image
+                img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 'RGB')
+                self.__img2thumbnail(img)
+
+            now_progress = math.ceil(i * 100 / total)
+            if now_progress != display_sub_progress:
+                display_sub_progress = now_progress
+                sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]".format(progress, display_sub_progress))
+
+        sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]".format(progress, 100))
+        video.release()
+
+
+    def __img2thumbnail(self, img):
+        region = self.__get_crop_region(img.size[0], img.size[1], self.cell['width'], self.cell['height'])
+        img = img.crop(region)
+
+        if self.thumbs_filter.lower() == 'antialias':
+            img.thumbnail((self.cell['width'], self.cell['height']), Image.ANTIALIAS)
+        else:
+            img.thumbnail((self.cell['width'], self.cell['height']))
+
+        img = img.crop((0, 0, self.cell['width'], self.cell['height']))
+
+        file_name = hashlib.md5(str(time.perf_counter()).encode('utf-8')).hexdigest() + '.jpg'
+
+        img_rgb = img.convert('RGB')
+        img_rgb.save(os.path.join(self.thumbs_dir, file_name))
+
+        r, g, b = self.__avg_color(img_rgb)
+        self.thumbs_info[file_name] = {'r': r, 'g': g, 'b': b}
 
     @staticmethod
     def __get_crop_region(width, height, sample_width, sample_height):
@@ -225,39 +300,33 @@ class PhotoMosaicCore(object):
         return (left, top, right, bottom)
 
     @staticmethod
-    def __ave_color(img):
-        width, height = img.size
-
-        r_total = 0
-        g_total = 0
-        b_total = 0
-
-        count = 0
-        for x in range(0, width):
-            for y in range(0, height):
-                r, g, b = img.getpixel((x, y))
-                r_total += r
-                g_total += g
-                b_total += b
-                count += 1
-
-        return (int)(r_total/count), (int)(g_total/count), (int)(b_total/count)
+    def __avg_color(img):
+        rgb = np.mean(np.array(img), axis=(0, 1))
+        return (int)(rgb[0]), (int)(rgb[1]), (int)(rgb[2])
 
     def __get_filename_for_closest_color(self, rgb, coordy, coordx):
 
         diff_thumbs_info = {}
         for k, v in self.thumbs_info.items():
             diff_val = math.sqrt(
-                math.pow((rgb[0] - v['r']) * 0.650, 2) +
-                math.pow((rgb[1] - v['g']) * 0.794, 2) +
-                math.pow((rgb[2] - v['b']) * 0.557, 2)
+                math.pow((rgb[0] - v['r']) * self.rgb_weight['r'], 2) +
+                math.pow((rgb[1] - v['g']) * self.rgb_weight['g'], 2) +
+                math.pow((rgb[2] - v['b']) * self.rgb_weight['b'], 2)
             )
             diff_thumbs_info[k] = diff_val
 
         sorted_info = sorted(diff_thumbs_info.items(), key=lambda kv: kv[1])
 
-        suitable = False
         index = 0
+        if self.tolerance != 0:
+            for info in sorted_info:
+                if info[1] <= self.tolerance:
+                    index += 1
+
+            if index != 0:
+                index = random.randrange(index)
+
+        suitable = False
         while not suitable:
 
             suitable = True
@@ -284,35 +353,47 @@ class PhotoMosaicCore(object):
 if __name__ == "__main__":
     """
     core = PhotoMosaicCore(
-        "sample2.jpg",
-        96,
-        128,
+        "sample2-2.jpg",
+        #96,
+        #128,
+        100,
+        100,
         scale=10,
         min_space_same_thumb=4,
+        enhance_colors=27,
         gen_thumbs=True)
     core.generate_mosaic()
     """
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("-img", "--input-image", dest="img", required=True, help="input image path")
-    parser.add_argument("-row", dest="row", required=True, help="number of thumbnails to create per row")
-    parser.add_argument("-col", dest="col", required=True, help="number of thumbnails to create per col")
-    parser.add_argument("-scale", dest="scale", default=1.0, help="output image size = input image size * scale")
+    parser.add_argument("-i", "-input-image", dest="img", required=True, help="input image path")
+    parser.add_argument("-r", "-row", dest="row", required=True, help="number of thumbnails to create per row")
+    parser.add_argument("-c", "-col", dest="col", required=True, help="number of thumbnails to create per col")
+    parser.add_argument("-m", "-material", dest="material_dir", default="", help="material folder path")
+    parser.add_argument("-s", "-scale", dest="scale", default=1.0, help="output image size = input image size * scale")
+    parser.add_argument("-vs", "-video-sampling-ms", dest="video_sampling_ms", default=5000, help="sampling video image interval (ms)")
     parser.add_argument("--no-thumbs", dest="gen_thumbs", action='store_false', help="won't (re)generate thumbnails before creating mosaic")
-    parser.add_argument("-out", "--output-name", dest="tgt_img_filename", default="", help="output file name")
-    parser.add_argument("-gap", dest="min_space_same_thumb", default=4, help="the min distance with same thumbnails image")
+    parser.add_argument("-o", "-output-name", dest="tgt_img_filename", default="", help="output file name")
+    parser.add_argument("-g", "-gap", dest="min_space_same_thumb", default=4, help="the min distance with same thumbnails image")
     parser.add_argument("-e", "-enhance-colors", dest="enhance_colors", default=27, help="enhance colors with original image (0~100%)")
+    parser.add_argument("-t", "-tolerance", dest="tolerance", default=0, help="set tolerance and seed args can generate different photo mosaic even the material images are the same")
+    parser.add_argument("-seed", dest="seed", default=0, help="random seed, using it on video image sampling and choose thumbs image")
     parser.add_argument("-f", "-thumbs_filter", dest="thumbs_filter", default="", help="use filter for creating thumbnails")
     args = parser.parse_args()
 
     core = PhotoMosaicCore(
         args.img,
+        args.material_dir,
         (int)(args.row),
         (int)(args.col),
         (float)(args.scale),
+        (int)(args.video_sampling_ms),
         args.gen_thumbs,
         args.tgt_img_filename,
         (int)(args.min_space_same_thumb),
         (int)(args.enhance_colors),
+        (float)(args.tolerance),
+        (int)(args.seed),
         args.thumbs_filter)
 
     core.generate_mosaic()
