@@ -72,6 +72,24 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output2-demo.jpg)
 
 
+
+# Demo sample3 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output3.jpg))
+
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample3.jpg)
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output3-demo.jpg)
+
+
+
+# Demo sample4 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output4.jpg))
+
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample4.jpg)
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output4-demo.jpg)
+
+
 # Reference
 1. eflorit / mosaic-generator - (https://github.com/eflorit/mosaic-generator)
 
