@@ -1,3 +1,9 @@
 /core/venv
 /core/.idea
 /core/src/photos
+/core/src/build
+/core/src/dist
+/core/src/output
+/core/src/__pycache__
+/core/src/thumbs_info.json
+/core/src/temp
