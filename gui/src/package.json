@@ -1,0 +1,54 @@
+{
+  "name": "PhotoMosaic-Artifact",
+  "version": "1.2.0",
+  "license": "MIT",
+  "description": "PhotoMosaic-Artifact",
+  "author": "zmcx16 <zmcx16@gmail.com>",
+  "main": "./main.js",
+  "scripts": {
+    "start": "electron main.js",
+    "build-dir": "electron-builder --dir",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux"
+  },
+  "build": {
+    "productName": "PhotoMosaic-Artifact",
+    "appId": "com.electron.PhotoMosaic-Artifact-com-app",
+    "copyright": "© 2019 zmcx16",
+    "compression": "maximum",
+    "asar": false,
+    "directories": {
+      "output": "./dist"
+    },
+    "files": {
+      "filter": [
+        "!user_data/*"
+      ]
+    },
+    "win": {
+      "icon": "PhotoMosaic-Artifact.ico",
+      "target": "nsis",
+      "legalTrademarks": "zmcx16"
+    },
+    "mac": {
+      "icon": "PhotoMosaic-Artifact1024x1024.png"
+    },
+    "linux": {
+      "icon": "PhotoMosaic-Artifact256x256.png"
+    }
+  },
+  "devDependencies": {
+    "electron": "^5.0.1",
+    "electron-builder": "^20.39.0",
+    "electron-rebuild": "^1.8.4",
+    "eslint": "^5.16.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "detect-port": "^1.3.0",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.15.0",
+    "zerorpc": "^0.9.8"
+  }
+}

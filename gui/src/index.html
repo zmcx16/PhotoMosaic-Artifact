@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>PhotoMosaic-Artifact</title>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script>
+      window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min.js');
+      require('./node_modules/bootstrap/dist/js/bootstrap.min.js');
+    </script>
+    <link href="app.css" rel="stylesheet">
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <div id="alert-dialog-hidden-btn" style="display:none;" data-toggle="modal" data-target="#alert-dialog"></div>
+    <div id="alert-dialog" class="modal inmodal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static"
+      data-keyboard="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title"></div>
+            <div id="alert-dialog-content"></div>
+            <button type="button" class="close" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

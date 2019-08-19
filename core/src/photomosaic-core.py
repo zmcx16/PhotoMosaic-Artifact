@@ -54,6 +54,7 @@ class PhotoMosaicCore(object):
             scale=1.0,
             video_sampling_ms=5000,
             gen_thumbs=True,
+            output_path='',
             tgt_img_filename='',
             min_space_same_thumb=4,
             enhance_colors=27,
@@ -69,6 +70,8 @@ class PhotoMosaicCore(object):
         self.scale = scale
         self.video_sampling_ms = video_sampling_ms
         self.gen_thumbs = gen_thumbs
+        if output_path != '':
+            self.output_path = output_path
         self.tgt_img_filename = tgt_img_filename
         self.min_space_same_thumb = min_space_same_thumb
         self.enhance_colors = enhance_colors
@@ -374,6 +377,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "-scale", dest="scale", default=1.0, help="output image size = input image size * scale")
     parser.add_argument("-vs", "-video-sampling-ms", dest="video_sampling_ms", default=5000, help="sampling video image interval (ms)")
     parser.add_argument("--no-thumbs", dest="gen_thumbs", action='store_false', help="won't (re)generate thumbnails before creating mosaic")
+    parser.add_argument("-p", "-output-path", dest="output_path", default="", help="output path")
     parser.add_argument("-o", "-output-name", dest="tgt_img_filename", default="", help="output file name")
     parser.add_argument("-g", "-gap", dest="min_space_same_thumb", default=4, help="the min distance with same thumbnails image")
     parser.add_argument("-e", "-enhance-colors", dest="enhance_colors", default=27, help="enhance colors with original image (0~100%)")
@@ -390,6 +394,7 @@ if __name__ == "__main__":
         (float)(args.scale),
         (int)(args.video_sampling_ms),
         args.gen_thumbs,
+        args.output_path,
         args.tgt_img_filename,
         (int)(args.min_space_same_thumb),
         (int)(args.enhance_colors),
