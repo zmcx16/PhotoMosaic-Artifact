@@ -77,6 +77,7 @@ app.on('ready', () => {
 
   // core process
   let port_candidate = '7777';
+  /*
   detect_port(port_candidate, (err, _port) => {
     if (err) {
       console.log(err);
@@ -108,6 +109,7 @@ app.on('ready', () => {
       core_proc = child_process.spawn('python', [script, '-port', port]);
     }
   });
+  */
 });
 
 app.on('will-quit', () => {

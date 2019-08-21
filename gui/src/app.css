@@ -6,3 +6,39 @@ body {
   font-family: 'Comic Sans', 'Comic Sans MS';
   font-size: 14pt;
 }
+
+.config-page{
+  margin: 10px 10px;
+  display: inline-block;
+}
+
+.config-tab{
+  display: inline-block;
+}
+
+.text-label{
+  padding-bottom: 5px;
+  padding-right: 10px;
+  text-align: right;
+}
+
+.src-img-row, .output-row{
+  margin: 10px 10px;
+  /*height: 30px;*/
+  display: grid;
+  grid-template-columns: 80px auto 20px 30px;
+  /*justify-items: center;*/
+  align-items: center;
+}
+
+.src-img-col > *{
+  height: 25px;
+}
+
+.output-col > *{
+  height: 25px;
+}
+
+#run-stop-button{
+  display: inline-block;
+}
