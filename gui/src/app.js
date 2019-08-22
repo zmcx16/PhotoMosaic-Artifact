@@ -36,7 +36,18 @@ $(document).ready(function () {
 
   //call main run core
 
+  // register event
+  $('#src-img-select').on('click', function () {
+    var src_img_path = ipc.sendSync('openDialog', { 'properties': ['openFile'], 'filters': [{ name: 'Images', extensions: ['jpg', 'png', 'bmp'] }]});
+    if (src_img_path)
+      $('#src-img-input').val(src_img_path);
+  });
 
+  $('#output-select').on('click', function () {
+    var output_dir_path = ipc.sendSync('openDialog', { 'properties': ['openDirectory'] });
+    if (output_dir_path)
+      $('#output-dir-input').val(output_dir_path);
+  });
 
 });
 

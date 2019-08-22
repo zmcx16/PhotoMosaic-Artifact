@@ -66,7 +66,7 @@ app.on('ready', () => {
     webPreferences: {
       nodeIntegration: true
     },
-    width: 960, height: 600
+    width: 1024, height: 600
     //,minWidth: 640, minHeight: 480
     //,maxWidth: 1024, maxHeight: 768
     });
@@ -126,6 +126,14 @@ ipc.on('getPort', (event) => {
 ipc.on('getPortSync', (event) => {
   console.log('get port: ' + port);
   event.returnValue = port;
+});
+
+ipc.on('openDialog', (event, arg) => {
+  const { dialog } = require('electron');
+  event.returnValue = dialog.showOpenDialog(mainWindow, {
+    properties: arg['properties'],
+    filters: arg['filters']
+  });
 });
 
 function quitAll(){

@@ -22,35 +22,55 @@
         <div class="tab-pane fade show active" id="nav-config-main" role="tabpanel" aria-labelledby="nav-config-main-tab">
           <div class="src-img-row">
             <div class="src-img-col text-label">src img:</div>
-            <div class="src-img-col"><input type="text" id="src-img-input" placeholder="  source image path" name="src-img-path">
-            </div>
+            <div class="src-img-col input-val"><input type="text" id="src-img-input" placeholder="  source image path" name="src-img-path"></div>
             <div></div>
-            <div class="src-img-col">
-              <div class="button btn-select" id="src-img-select" type="button">...</div>
-            </div>
+            <div class="src-img-col"><div class="button btn-select" id="src-img-select" type="button">...</div></div>
           </div>
           <div class="output-row">
             <div class="output-col text-label">output:</div>
-            <div class="output-col"><input type="text" id="output-input" placeholder="  source image path" name="output-path">
+            <div class="output-col input-val"><input type="text" id="output-dir-input" placeholder="  ouput folder path" name="output-path"></div>
+            <div></div>
+            <div class="output-col"><div class="button btn-select" id="output-select" type="button">...</div></div>
+          </div>
+          <div class="row-col-scale-row">
+            <div class="row-col-scale-col text-label">Row:</div>
+            <div class="row-col-scale-col input-val"><input type="text" id="row-input" name="row-input"></div>
+            <div></div>
+            <div class="row-col-scale-col text-label">Col:</div>
+            <div class="row-col-scale-col input-val"><input type="text" id="col-input" name="col-input"></div>
+            <div></div>
+            <div class="row-col-scale-col text-label">Scale:</div>
+            <div class="row-col-scale-col input-val"><input type="text" id="scale-input" name="scale-input"></div>
+            <div></div>
+            <div class="row-col-scale-col text-label"><button id="auto-button" type="button" class="click-btn-v1">Auto</button></div>
+            <div></div>
+            <div class="row-col-scale-col text-label grey">output:</div>
+            <div class="row-col-scale-col text-label grey" id="output-size">None</div>
+            <div></div>
+            <div class="row-col-scale-col text-label grey">thumbnails:</div>
+            <div class="row-col-scale-col text-label grey" id="thumbnails-size">None</div>
+            <div></div>
+          </div>
+          <div class="progress-control-row">
+            <div></div>
+            <div class="progress progress-control-col">
+              <div class="progress-bar" id="update-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                aria-valuemax="100" style="width:0%">
+                0%
+              </div>
             </div>
             <div></div>
-            <div class="output-col">
-              <div class="button btn-select" id="output-select" type="button">...</div>
+            <div class="progress-control-col">
+              <button id="run-button" type="button" class="click-btn-v2">Start</button>
+              <button id="stop-button" type="button" class="click-btn-v2" style="display:none;">Cancel</button>
             </div>
+            <div></div>
           </div>
         </div>
         <div class="tab-pane fade" id="nav-config-optional" role="tabpanel" aria-labelledby="nav-config-optional-tab">
         </div>
       </div>
     </div>
-    <button id="run-stop-button" type="button" class="click-btn-v2 run-stop-btn">
-      <svg id="run-stop-icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
-        <path
-          d="M31 28h-1.59l-.55-.55C30.82 25.18 32 22.23 32 19c0-7.18-5.82-13-13-13S6 11.82 6 19s5.82 13 13 13c3.23 0 6.18-1.18 8.45-3.13l.55.55V31l10 9.98L40.98 38 31 28zm-12 0c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9z"
-          fill="#0081f2" />
-        <path d="M0 0h48v48H0z" fill="none" />
-      </svg>
-    </button>
     <div class="material-page">
     </div>
     <div id="alert-dialog-hidden-btn" style="display:none;" data-toggle="modal" data-target="#alert-dialog"></div>

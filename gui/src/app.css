@@ -10,6 +10,7 @@ body {
 .config-page{
   margin: 10px 10px;
   display: inline-block;
+  width: calc(100% - 100px);
 }
 
 .config-tab{
@@ -20,6 +21,14 @@ body {
   padding-bottom: 5px;
   padding-right: 10px;
   text-align: right;
+}
+
+.text-label.grey{
+  color: grey;
+}
+
+.input-val > *{
+  width: -webkit-fill-available;
 }
 
 .src-img-row, .output-row{
@@ -39,6 +48,38 @@ body {
   height: 25px;
 }
 
-#run-stop-button{
-  display: inline-block;
+.row-col-scale-row{
+  margin: 10px 10px;
+  /*height: 30px;*/
+  display: grid;
+  grid-template-columns: 80px 50px 10px 60px 50px 10px 80px 35px 20px 50px 10px 100px 60px 50px 120px 40px 10px;
+  /*justify-items: center;*/
+  align-items: center;
+}
+
+
+.row-col-scale-col > *{
+  height: 25px;
+}
+
+#auto-button{
+  font-size: smaller;
+}
+
+.progress-control-row{
+  margin: 10px 10px;
+  /*height: 30px;*/
+  display: grid;
+  grid-template-columns: 80px auto 40px 60px 10px;
+  /*justify-items: center;*/
+  align-items: center;
+}
+
+.progress{
+  height: 30px;
+}
+
+#run-button,#stop-button{
+  height: 35px;
+  width: 70px;
 }
