@@ -12,6 +12,7 @@ const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 const app_path = app.getAppPath();
 const platform = os.platform();
+const image_sizeOf = require('image-size');
 
 const child_process = require('child_process');
 const detect_port = require('detect-port');
@@ -136,7 +137,104 @@ ipc.on('openDialog', (event, arg) => {
   });
 });
 
+ipc.on('getImageSize', (event, file_path) => {
+
+  if (file_path.length > 0){
+    image_sizeOf(file_path[0], function (err, dimensions) {
+      event.sender.send('getImageSize_callback', dimensions);
+    });
+  }
+});
+
+ipc.on('getImagesAndVideosInfo', (event, isFolder) => {
+
+  const { dialog } = require('electron');
+  const images_filter_list = ['png', 'bmp', 'jpg', 'gif'];
+  const videos_filter_list = ['mp4', 'mkv', 'avi'];
+  const filter_list = images_filter_list.concat(videos_filter_list);
+  
+  var material_list = [];
+  if (isFolder){
+    var foldlist = dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory', 'multiSelections']
+    });
+
+    if (foldlist){
+      var filelist_temp = [];
+      foldlist.forEach(function (item) {
+        walkSync(item, filelist_temp);
+      });
+
+      var images_cnt = 0, videos_cnt = 0;
+      filelist_temp.forEach(function (file_path) {
+        if (type_check(file_path, images_filter_list))
+          images_cnt++;
+        else if (type_check(file_path, videos_filter_list))
+          videos_cnt++;
+      });
+
+      foldlist.forEach(function (fold_path) {
+        material_list.push({ 'path': fold_path, 'size': 0, 'type': 'folder', 'images_cnt': images_cnt, 'videos_cnt': videos_cnt });
+      });
+    }
+
+  }else{
+    var filelist = dialog.showOpenDialog(mainWindow, {
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: 'Image / Video', extensions: filter_list }]
+    });
+
+    if (filelist) {
+      filelist.forEach(function (file_path) {
+        const stats = fs.statSync(file_path);
+        var type = '';
+        if (type_check(file_path, images_filter_list)){
+          type = 'image';
+        }
+        else if (type_check(file_path, videos_filter_list)){
+          type = 'video';
+        }
+        material_list.push({ 'path': file_path, 'size': stats.size, 'type': type, 'images_cnt': type == 'image' ? 1 : 0, 'videos_cnt': type == 'video' ? 1 : 0 });
+      });
+    }
+  }
+
+  event.returnValue = material_list;
+  
+});
+
 function quitAll(){
   app.quit();
   app.exit(0);
+}
+
+// common function
+function walkSync(dir, filelist) {
+  var path = path || require('path');
+  var fs = fs || require('fs'), files = fs.readdirSync(dir);
+  filelist = filelist || [];
+  files.forEach(function (file) {
+    if (fs.statSync(path.join(dir, file)).isDirectory()) {
+      filelist = walkSync(path.join(dir, file), filelist);
+    }
+    else {
+      filelist.push(path.join(dir, file));
+    }
+  });
+  return filelist;
+}
+
+function type_check(file_path, filter){
+
+  var ret = false;
+  filter.some(function (ext) {
+    if (file_path.toLowerCase().indexOf(ext.toLowerCase()) == file_path.length - ext.length) {
+      ret = true;
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return ret;
 }

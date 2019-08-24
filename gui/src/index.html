@@ -61,17 +61,101 @@
             </div>
             <div></div>
             <div class="progress-control-col">
-              <button id="run-button" type="button" class="click-btn-v2">Start</button>
-              <button id="stop-button" type="button" class="click-btn-v2" style="display:none;">Cancel</button>
+              <button id="start-cancel-button" type="button" class="click-btn-v2">Start</button>
             </div>
             <div></div>
           </div>
         </div>
         <div class="tab-pane fade" id="nav-config-optional" role="tabpanel" aria-labelledby="nav-config-optional-tab">
+          <div class="opt0-row">
+            <div></div>
+            <div class="opt0-col">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="no-thumbs">
+                <label class="custom-control-label" for="no-thumbs"></label>
+              </div>
+            </div>
+            <div class="opt0-col text-label">using previous thumbnails data</div>
+            <div></div>
+            <div class="opt0-col">
+              <div class="custom-control custom-checkbox active">
+                <input type="checkbox" class="custom-control-input" id="open-output" checked="checked">
+                <label class="custom-control-label" for="open-output"></label>
+              </div>
+            </div>
+            <div class="opt0-col text-label">open output image after task completed</div>
+            <div></div>
+          </div>
+          <div class="opt1-row">
+            <div class="opt1-col text-label">video sampling interval (ms):</div>
+            <div class="opt1-col input-val"><input type="text" id="vs-input" value="5000" name="vs-input"></div>
+            <div></div>
+            <div class="opt1-col text-label">output file name:</div>
+            <div class="opt1-col input-val"><input type="text" id="output-name-input" name="output-name-input"></div>
+            <div></div>
+          </div>
+          <div class="opt2-row">
+            <div class="opt2-col text-label">min distance with same thumbnails:</div>
+            <div class="opt2-col input-val"><input type="text" id="gap-input" value="4" name="gap-input"></div>
+            <div></div>
+            <div class="opt2-col text-label">enhance colors (0~100):</div>
+            <div class="opt2-col input-val"><input type="text" id="ec-input" value="27" name="ec-input"></div>
+            <div></div>
+          </div>
+          <div class="opt3-row">
+            <div class="opt3-col text-label">tolerance:</div>
+            <div class="opt3-col input-val"><input type="text" id="tolerance-input" value="0" name="tolerance-input"></div>
+            <div></div>
+            <div class="opt3-col text-label">seed:</div>
+            <div class="opt3-col input-val"><input type="text" id="seed-input" value="0" name="seed-input"></div>
+            <div></div>
+          </div>
         </div>
       </div>
     </div>
     <div class="material-page">
+      <fieldset class="sync-block group-setting">
+        <legend class="sync-block">Material</legend>
+        <div class="add-material-row">
+          <div class="add-material-col">
+            <div class="icon-text-btn" id="import-folders">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" style="fill: skyblue;"/>
+                <path d="M0 0h24v24H0z" fill="none" />
+              </svg>
+              <div class="text-label">Folders</div>
+            </div>
+          </div>
+          <div></div>
+          <div class="add-material-col" id="import-files">
+            <div class="icon-text-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path d="M0 0h24v24H0z" fill="none" />
+                <path
+                  d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z " style="fill: dodgerblue;"/>
+              </svg>
+              <div class="text-label">Files</div>
+            </div>
+          </div>
+          <div></div>
+          <div class="add-material-col text-label grey">Image:</div>
+          <div class="add-material-col text-label grey" id="image-count">0</div>
+          <div></div>
+          <div class="add-material-col text-label grey">Video:</div>
+          <div class="add-material-col text-label grey" id="video-count">0</div>
+          <div></div>
+        </div>
+        <table id="material-table">
+          <thead>
+            <th id="th-path">Path</th>
+            <th id="th-type">Type</th>
+            <th id="th-size">Size</th>
+            <th id="th-del">Del</th>
+          </thead>
+          <tbody id="material-tbody">
+          </tbody>
+        </table>
+      </fieldset>
     </div>
     <div id="alert-dialog-hidden-btn" style="display:none;" data-toggle="modal" data-target="#alert-dialog"></div>
     <div id="alert-dialog" class="modal inmodal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static"

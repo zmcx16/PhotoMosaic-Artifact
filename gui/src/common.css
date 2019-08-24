@@ -2,6 +2,37 @@ button:focus {
   outline: 0 !important;
 }
 
+.btn {
+  background-color: DodgerBlue;
+  border: none;
+  color: white;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: RoyalBlue;
+}
+
+.group-setting{
+  margin: 10px;
+}
+
+fieldset.sync-block {
+  border: 1px groove #ddd;
+  padding: 0 20px 20px 20px;
+  box-shadow:  0px 0px 0px 0px #000;
+}
+
+legend.sync-block {
+  width:inherit;
+  padding:0 10px;
+  border-bottom:none;
+  font-size: large;
+}
+
 .click-btn-v1, .click-btn-v2 {
   display: inline-block;
   cursor: pointer;
@@ -60,52 +91,6 @@ button:focus {
   width: 80px;
 }
 
-/* popup add window */
-#add-popup{
-    font-size: 16px;
-    display: none;
-    background-color: ivory;
-    width: 230px;
-    padding: 15px 15px;
-    /*left: 98px;*/
-    /*top: 127px;*/
-    position: fixed;
-    z-index: 2;
-    box-shadow: 0 2px 4px rgba(0,0,0,.2);
-}
-
-#search-bar{
-  margin-bottom: 15px;
-}
-
-#add-symbol-input{
-  font-size: 16px;
-  width: 190px;
-}
-
-#search-icon{
-  width: 22px;
-  height: 30px;
-  position: fixed;
-  cursor: pointer;
-  position: absolute;
-  right: 26px;
-  padding: 0px;
-}
-
-.btn-secondary2 {
-  color: #292b2c;
-  background-color: #fff;
-  border-color: #ccc;
-}
-
-.btn-secondary2.active, .btn-secondary2:active, .show>.btn-secondary2.dropdown-toggle {
-    color: #292b2c;
-    background-color: #e6e6e6;
-    background-image: none;
-    border-color: #adadad;
-}
-
 .tab-content{
   border: 1px solid #999;
 }
@@ -117,5 +102,5 @@ button:focus {
 .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
   color: #495057;
   background-color: snow;
-  border-color: #999 #999 #fff;
+  border-color: #999 #999 snow;
 }
