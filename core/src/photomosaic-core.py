@@ -8,11 +8,12 @@ import hashlib
 from timeit import default_timer as timer
 from datetime import timedelta
 import random
-import ctypes
+import json
 
 from PIL import Image
 import numpy as np
 import cv2
+import zerorpc
 
 
 class PhotoMosaicCore(object):
@@ -23,9 +24,15 @@ class PhotoMosaicCore(object):
 
     # configure
     thumbs_dir = os.path.join(".", "thumbnails")
-    material_dir = os.path.join(".", "material")
+    material = os.path.join(".", "material")
     thumbs_info_path = os.path.join(".", "thumbs_info.json")
     output_path = os.path.join(".", "output")
+
+    # only for GUI tool
+    ipc_mode = False
+    port = 0
+    root_path = ''
+    client = None
 
     src_img_path = ''
     row = 0
@@ -44,11 +51,12 @@ class PhotoMosaicCore(object):
     cell = {}
     thumbs_info = {}
     matrix = None
+    output_tgt_path = None
 
     def __init__(
             self,
             src_img_path,
-            material_dir,
+            material,
             row,
             col,
             scale=1.0,
@@ -63,8 +71,8 @@ class PhotoMosaicCore(object):
             thumbs_filter=''):
 
         self.src_img_path = src_img_path
-        if material_dir != '':
-            self.material_dir = material_dir
+        if material != '':
+            self.material = material
         self.row = row
         self.col = col
         self.scale = scale
@@ -79,7 +87,37 @@ class PhotoMosaicCore(object):
         random.seed(seed)
         self.thumbs_filter = thumbs_filter
 
-        self.matrix = [[0] * self.col for _ in range(self.row)]
+    def set_args_from_tool(self, tool_args_str):
+
+        tool_args = json.loads(tool_args_str)
+
+        self.ipc_mode = True
+        self.port = tool_args["port"]
+        self.root_path = tool_args["root_path"]
+
+        self.thumbs_dir = os.path.join(self.root_path, "thumbnails")
+        self.thumbs_info_path = os.path.join(self.root_path, "thumbs_info.json")
+
+        self.src_img_path = tool_args["input-image"]
+        self.material = tool_args["material"]
+        self.row = tool_args["row"]
+        self.col = tool_args["col"]
+        self.scale = tool_args["scale"]
+
+        with open('tool_args_str1.data', 'w') as file:
+            file.write(tool_args_str)
+
+        self.video_sampling_ms = tool_args["video-sampling-ms"]
+        self.gen_thumbs = not tool_args["no-thumbs"]
+        self.output_path = tool_args["output-path"]
+        self.tgt_img_filename = tool_args["output-name"]
+        self.min_space_same_thumb = tool_args["gap"]
+        self.enhance_colors = tool_args["enhance-colors"]
+        self.tolerance = tool_args["tolerance"]
+        random.seed(tool_args["seed"])
+
+        self.client = zerorpc.Client()
+        self.client.connect("tcp://127.0.0.1:" + self.port)
 
     def generate_mosaic(self):
 
@@ -91,8 +129,11 @@ class PhotoMosaicCore(object):
         end = timer()
         print()
         print('Task Completed, Execution Time: {0}'.format(timedelta(seconds=end - start)))
+        self.__send_status2tool(0, 100, 'Mission Completed')
 
     def __prepare(self):
+
+        self.matrix = [[0] * self.col for _ in range(self.row)]
 
         img = Image.open(self.src_img_path)
         self.input['img'] = img.resize(
@@ -116,9 +157,6 @@ class PhotoMosaicCore(object):
         self.cell['width'] = (int)(self.input['width'] / self.col)
         self.cell['height'] = (int)(self.input['height'] / self.row)
 
-        if not os.path.exists(self.material_dir):
-            os.makedirs(self.material_dir)
-
         if not os.path.exists(self.thumbs_dir):
             os.makedirs(self.thumbs_dir)
 
@@ -134,10 +172,12 @@ class PhotoMosaicCore(object):
 
     def __generate(self):
 
-        print('Generating photo mosaic image...')
+        print('Generating photo mosaic image . . .')
+        self.__send_status2tool(1, 0, 'Generating photo mosaic . . .')
 
         display_progress = 0
         sys.stdout.write("\rprogress: {:.0f}%".format(display_progress))
+        self.__send_status2tool(1, display_progress, 'Generating photo mosaic . . .')
         total = self.row * self.col
 
         tgt_img = Image.new('RGB', (self.input['width'], self.input['height']))
@@ -166,18 +206,23 @@ class PhotoMosaicCore(object):
             if now_progress != display_progress:
                 display_progress = now_progress
                 sys.stdout.write("\rprogress: {:.0f}%".format(display_progress))
+                self.__send_status2tool(1, display_progress, 'Generating photo mosaic . . .')
 
         sys.stdout.write("\rprogress: 100%")
+        self.__send_status2tool(1, 100, '')
         print()
         if self.tgt_img_filename:
-            tgt_img.save(os.path.join(self.output_path, self.tgt_img_filename+'.jpg'), format='JPEG', subsampling=0, quality=100)
+            self.output_tgt_path = os.path.join(self.output_path, self.tgt_img_filename+'.jpg')
+            tgt_img.save(self.output_tgt_path, format='JPEG', subsampling=0, quality=100)
         else:
-            tgt_img.save(os.path.join(self.output_path, 'output_{0}.jpg'.format(time.perf_counter())), format='JPEG', subsampling=0, quality=100)
+            self.output_tgt_path = os.path.join(self.output_path, 'output_{0}.jpg'.format(time.perf_counter()))
+            tgt_img.save(self.output_tgt_path, format='JPEG', subsampling=0, quality=100)
 
     # (re)generates thumbnails and determines average color for each image
     def __gen_thumbs(self):
 
-        print('Generating thumbnails...')
+        print('Generating thumbnails . . .')
+        self.__send_status2tool(1, 0, 'Generating thumbnails . . .')
 
         # clear thumbs files
         for the_file in os.listdir(self.thumbs_dir):
@@ -189,36 +234,50 @@ class PhotoMosaicCore(object):
                 print(e)
 
         material_list = []
-        for root, dirs, files in os.walk(self.material_dir):
-            for f in files:
-                material_list.append(os.path.join(root, f))
+
+        if self.ipc_mode:  # the array include folders or files
+            for path_info in self.material:
+                if path_info["type"] == "folder":
+                    for root, dirs, files in os.walk(path_info["path"]):
+                        for f in files:
+                            material_list.append(os.path.join(root, f))
+                else:
+                    material_list.append(path_info["path"])
+
+        else:  # only one folder path
+            for root, dirs, files in os.walk(self.material):
+                for f in files:
+                    material_list.append(os.path.join(root, f))
 
         if len(material_list) == 0:
-            raise Exception('No photos to process in ', self.material_dir)
+            raise Exception('No photos to process in ', self.material)
 
         display_progress = 0
         sys.stdout.write("\rprogress: {:.0f}%".format(display_progress))
+        self.__send_status2tool(1, display_progress, 'Generating thumbnails . . .')
         total = len(material_list)
 
         for idx, file in enumerate(material_list):
             sub_ext = file[-4:]
-            if (sub_ext.endswith('.jpg') or
-                    sub_ext.endswith('jpeg') or
-                    sub_ext.endswith('.png') or
-                    sub_ext.endswith('.gif') or
-                    sub_ext.endswith('.bmp')):
+            if (sub_ext.lower().endswith('.jpg') or
+                    sub_ext.lower().endswith('jpeg') or
+                    sub_ext.lower().endswith('.png') or
+                    sub_ext.lower().endswith('.gif') or
+                    sub_ext.lower().endswith('.bmp')):
                 self.__img2thumbnail(Image.open(file))
-            elif (sub_ext.endswith('.mkv') or
-                    sub_ext.endswith('.avi') or
-                    sub_ext.endswith('.mp4')):
+            elif (sub_ext.lower().endswith('.mkv') or
+                    sub_ext.lower().endswith('.avi') or
+                    sub_ext.lower().endswith('.mp4')):
                 self.__gen_thumbs_from_videos(file, display_progress)
 
             now_progress = math.ceil(idx * 100 / total)
             if now_progress != display_progress:
                 display_progress = now_progress
                 sys.stdout.write("\rprogress: {:.0f}%       ".format(display_progress))
+                self.__send_status2tool(1, display_progress, 'Generating thumbnails . . .')
 
         sys.stdout.write("\rprogress: 100%      ")
+        self.__send_status2tool(1, 100, '')
         print()
         # save thumbs_info.json
         with open(self.thumbs_info_path, 'w') as f:
@@ -256,8 +315,10 @@ class PhotoMosaicCore(object):
             if now_progress != display_sub_progress:
                 display_sub_progress = now_progress
                 sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]     ".format(progress, display_sub_progress))
+                self.__send_status2tool(1, progress, 'Extracting video [{:.0f}%]'.format(display_sub_progress))
 
         sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]     ".format(progress, 100))
+        self.__send_status2tool(1, progress, '')
         video.release()
 
 
@@ -353,6 +414,14 @@ class PhotoMosaicCore(object):
         self.matrix[coordy][coordx] = tgt_file_name
         return tgt_file_name
 
+    def __send_status2tool(self, ret, progress, display_status):
+        # ret: 0-> task completed, 1->running
+        if self.ipc_mode:
+            msg = {'ret': ret, 'progress': progress, 'display_status': display_status}
+            if ret == 0:
+                msg['output_path'] = self.output_tgt_path
+            self.client.status(msg)
+
 
 if __name__ == "__main__":
     """
@@ -370,10 +439,10 @@ if __name__ == "__main__":
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "-input-image", dest="img", required=True, help="input image path")
-    parser.add_argument("-r", "-row", dest="row", required=True, help="number of thumbnails to create per row")
-    parser.add_argument("-c", "-col", dest="col", required=True, help="number of thumbnails to create per col")
-    parser.add_argument("-m", "-material", dest="material_dir", default="", help="material folder path")
+    parser.add_argument("-i", "-input-image", dest="img", default="", help="input image path")
+    parser.add_argument("-r", "-row", dest="row", default=0, help="number of thumbnails to create per row")
+    parser.add_argument("-c", "-col", dest="col", default=0, help="number of thumbnails to create per col")
+    parser.add_argument("-m", "-material", dest="material", default="", help="material folder path")
     parser.add_argument("-s", "-scale", dest="scale", default=1.0, help="output image size = input image size * scale")
     parser.add_argument("-vs", "-video-sampling-ms", dest="video_sampling_ms", default=5000, help="sampling video image interval (ms)")
     parser.add_argument("--no-thumbs", dest="gen_thumbs", action='store_false', help="won't (re)generate thumbnails before creating mosaic")
@@ -384,11 +453,14 @@ if __name__ == "__main__":
     parser.add_argument("-t", "-tolerance", dest="tolerance", default=0, help="set tolerance and seed args can generate different photo mosaic even the material images are the same")
     parser.add_argument("-seed", dest="seed", default=0, help="random seed, using it on video image sampling and choose thumbs image")
     parser.add_argument("-f", "-thumbs_filter", dest="thumbs_filter", default="", help="use filter for creating thumbnails")
-    args = parser.parse_args()
 
+    # only use for gui tool
+    parser.add_argument("-tool-args", dest="tool_args", default="")
+
+    args = parser.parse_args()
     core = PhotoMosaicCore(
         args.img,
-        args.material_dir,
+        args.material,
         (int)(args.row),
         (int)(args.col),
         (float)(args.scale),
@@ -401,5 +473,8 @@ if __name__ == "__main__":
         (float)(args.tolerance),
         (int)(args.seed),
         args.thumbs_filter)
+
+    if args.tool_args != '':
+        core.set_args_from_tool(args.tool_args)
 
     core.generate_mosaic()
