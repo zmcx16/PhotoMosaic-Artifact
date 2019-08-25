@@ -60,6 +60,8 @@
               </div>
             </div>
             <div></div>
+            <div class="progress-status-col text-label grey" id="progress-status">Ready</div>
+            <div></div>
             <div class="progress-control-col">
               <button id="start-cancel-button" type="button" class="click-btn-v2">Start</button>
             </div>
@@ -120,7 +122,7 @@
           <div class="add-material-col">
             <div class="icon-text-btn" id="import-folders">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" style="fill: skyblue;"/>
+                <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" style="fill: gold;"/>
                 <path d="M0 0h24v24H0z" fill="none" />
               </svg>
               <div class="text-label">Folders</div>
@@ -168,6 +170,25 @@
             <button type="button" class="close" data-dismiss="modal">
               <span>&times;</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="check-dialog-hidden-btn" style="display:none;" data-toggle="modal" data-target="#check-dialog"></div>
+    <div id="check-dialog" class="modal inmodal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static"
+      data-keyboard="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title "></div>
+            <div id="check-dialog-content"></div>
+            <button type="button" class="close  check-dialog-close" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button class="btn anime-btn ok-cancel-btn" id="check-dialog-ok-btn">OK</button>
+            <button class="btn anime-btn ok-cancel-btn" data-dismiss="modal">Cancel</button>
           </div>
         </div>
       </div>

@@ -20,7 +20,7 @@ const detect_port = require('detect-port');
 let appIcon = null;
 let mainWindow = null;
 
-let port = '';
+let port = -1;
 let core_proc = null;
 
 var root_path = '';
@@ -77,8 +77,7 @@ app.on('ready', () => {
   });
 
   // core process
-  let port_candidate = '7777';
-  /*
+  let port_candidate = 7777;
   detect_port(port_candidate, (err, _port) => {
     if (err) {
       console.log(err);
@@ -91,32 +90,12 @@ app.on('ready', () => {
       console.log(`port: ${port_candidate} was occupied, try port: ${_port}`);
       port = _port;
     }
-
-    console.log('dir path:' + __dirname);
-    console.log('platform:' + platform);
-    let script = path.join(path.resolve(__dirname, '..', '..'), 'core', 'src', 'photomosaic-core.py');
-    if (!fs.existsSync(script)) {
-      if (platform == 'win32') {
-        script = path.join(__dirname, 'core-win', 'photomosaic-core.exe');
-      }else if(platform == 'darwin'){
-        script = path.join(__dirname, 'core-mac', 'photomosaic-core');
-      } else if (platform == 'linux'){
-        script = path.join(__dirname, 'core-linux', 'photomosaic-core');
-      } 
-      console.log(script);
-      core_proc = child_process.execFile(script, ['-port', port]);
-
-    }else{
-      core_proc = child_process.spawn('python', [script, '-port', port]);
-    }
   });
-  */
+  
 });
 
 app.on('will-quit', () => {
-  console.log('kill core process');
-  core_proc.kill();
-  core_proc = null;
+  killCore();
 });
 
 // ipc register
@@ -127,6 +106,45 @@ ipc.on('getPort', (event) => {
 ipc.on('getPortSync', (event) => {
   console.log('get port: ' + port);
   event.returnValue = port;
+});
+
+ipc.on('exeCore', (event, args) => {
+
+  args['port'] = port.toString();
+  args['root_path'] = root_path;
+
+  console.log('dir path:' + __dirname);
+  console.log('platform:' + platform);
+  let script = path.join(path.resolve(__dirname, '..', '..'), 'core', 'src', 'photomosaic-core.py');
+  if (!fs.existsSync(script)) {
+    if (platform == 'win32') {
+      script = path.join(__dirname, 'core-win', 'photomosaic-core.exe');
+    } else if (platform == 'darwin') {
+      script = path.join(__dirname, 'core-mac', 'photomosaic-core');
+    } else if (platform == 'linux') {
+      script = path.join(__dirname, 'core-linux', 'photomosaic-core');
+    }
+    console.log(script);
+    core_proc = child_process.execFile(script, ['-tool-args', JSON.stringify(args)]);
+
+  } else {
+    console.log(args);
+    core_proc = child_process.spawn('python', [script, '-tool-args', JSON.stringify(args)]);
+  }
+});
+
+ipc.on('killCore', () => {
+  killCore();
+});
+
+ipc.on('navFile', (event, file) => {
+  if (platform == 'win32') {
+    child_process.execSync('start ' + file);
+  } else if (platform == 'darwin') {
+    child_process.execSync('open ' + file);
+  } else if (platform == 'linux') {
+    child_process.execSync('xdg-open ' + file);
+  }
 });
 
 ipc.on('openDialog', (event, arg) => {
@@ -206,6 +224,13 @@ ipc.on('getImagesAndVideosInfo', (event, isFolder) => {
 function quitAll(){
   app.quit();
   app.exit(0);
+}
+
+function killCore(){
+  console.log('kill core process');
+  if (core_proc)
+    core_proc.kill();
+  core_proc = null;
 }
 
 // common function

@@ -76,13 +76,18 @@ body {
   margin: 10px 10px;
   /*height: 30px;*/
   display: grid;
-  grid-template-columns: 80px auto 40px 60px 10px;
+  grid-template-columns: 80px auto 20px 250px 10px 70px 10px;
   /*justify-items: center;*/
   align-items: center;
 }
 
 .progress{
   height: 30px;
+}
+
+#progress-status{
+  text-align: left;
+  font-size: smaller;
 }
 
 #start-cancel-button{

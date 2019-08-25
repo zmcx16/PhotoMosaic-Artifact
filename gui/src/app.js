@@ -3,35 +3,36 @@
 const electron = require('electron');
 const ipc = electron.ipcRenderer;
 const zerorpc = require("zerorpc");
-var client = new zerorpc.Client();
+var server = null;
+var server_port = -1;
 
 var src_img_size = null;
+var row_col_scale_valid = false;
 var video_cnt = 0;
 var image_cnt = 0;
+var progress_status_interval = null;
 
 // ipc register
 ipc.on('getPort_callback', (event, port) => {
 
-  client.connect("tcp://127.0.0.1:" + port);
-  
-  /*
-  sendCmdToCore('genPhotoImage', 'arg1', (error, res) => {
-    if (error) {
-      console.error(error);
-      console.error(res);
-    } else {
-      //update console
-    }
-  });
-  */
+  if (port<0){
+    $('#alert-dialog-content')[0].innerText = "get IPC port failed, please restart it and try again";
+    $('#alert-dialog-hidden-btn').click();
+  }
+  else{
+    server_port = port;
+    server = new zerorpc.Server({
+      status: function (msg, reply) {
+        //console.log(msg);
+        update_status_from_core(msg);
+        reply(null, "");
+      }
+    });
 
-  // task running
+    server.bind("tcp://0.0.0.0:" + server_port);
+    console.log('ready for get core message');
+  }
 
-});
-
-
-ipc.on('getCoreStatus', () => {
-  //update UI
 });
 
 ipc.on('getImageSize_callback', (event, dimensions) => {
@@ -46,7 +47,8 @@ ipc.on('getImageSize_callback', (event, dimensions) => {
 // OnStart
 $(document).ready(function () {
 
-  //call main run core
+  // get port
+  ipc.send('getPort');
 
   // register event
   $('#src-img-select').click(function () {
@@ -65,6 +67,25 @@ $(document).ready(function () {
 
   $('#auto-button').click(function () {
     auto_calc_config();
+  });
+
+  $('#start-cancel-button').click(function (){
+    if ($('#start-cancel-button')[0].innerText == 'Start'){
+      validate_config();
+    }
+    else{
+      $('#check-dialog-content')[0].innerText = "Are you sure you want to cancel this job?";
+      $('#check-dialog-hidden-btn').click();
+    }
+  });
+
+  $('#check-dialog-ok-btn').click(function () {
+    $('#start-cancel-button')[0].innerText = 'Start';
+    $('#update-progress')[0].style.width = '0%';
+    $('#update-progress')[0].innerHTML = '0%';
+    $('#progress-status')[0].innerText = 'Ready';
+    ipc.send('killCore');
+    $(".check-dialog-close").trigger("click");
   });
 
   $('#import-folders').click(function () {
@@ -93,6 +114,63 @@ $(document).ready(function () {
 });
 
 // main function
+function validate_config(){
+
+  var err_msg = null;
+  if ($('#src-img-input')[0].value ==''){
+    err_msg = 'miss src img path';
+  }
+  if ($('#output-dir-input')[0].value == '') {
+    err_msg = 'miss output folder path';
+  }
+  if ($('#row-input')[0].value == '') {
+    err_msg = 'miss row value';
+  }
+  if ($('#col-input')[0].value == '') {
+    err_msg = 'miss col value';
+  }
+  if ($('#scale-input')[0].value == '') {
+    err_msg = 'miss scale value';
+  }
+
+  if (!row_col_scale_valid) {
+    err_msg = 'row, col or scale is invalid';
+  }
+
+  if (err_msg) {
+    $('#alert-dialog-content')[0].innerText = err_msg;
+    $('#alert-dialog-hidden-btn').click();
+  }else{
+
+    $('#start-cancel-button')[0].innerText = 'Cancel';
+
+    var args = {}
+    args["input-image"] = $('#src-img-input')[0].value;
+    args["output-path"] = $('#output-dir-input')[0].value;
+    args["row"] = parseInt($('#row-input')[0].value);
+    args["col"] = parseInt($('#col-input')[0].value);
+    args["scale"] = parseFloat($('#scale-input')[0].value);
+    args["material"] = [];
+    $('.material-tr').each(function () {
+      var path_td = $(this).children('.path-td')[0];
+      var type_td = $(this).children('.type-td')[0];
+      args["material"].push({ "path": path_td.innerText, "type": type_td.innerText});
+    });   
+
+    args["no-thumbs"] =         $('#no-thumbs').is(':checked');
+    args["video-sampling-ms"] = parseInt($('#vs-input')[0].value);
+    args["output-name"] =       $('#output-name-input')[0].value;
+    args["gap"] =               parseInt($('#gap-input')[0].value);
+    args["enhance-colors"] =    parseInt($('#ec-input')[0].value);
+    args["tolerance"] =         parseFloat($('#tolerance-input')[0].value);
+    args["seed"] =              parseInt($('#seed-input')[0].value);
+
+    ipc.send('exeCore', args);
+
+  }
+
+}
+
 function display_output_info(){
 
   let output_size = null;
@@ -113,9 +191,11 @@ function display_output_info(){
     if (thumbnails_size){
       $("#thumbnails-size")[0].innerText = thumbnails_size['width'] + 'x' + thumbnails_size['height'];
       $("#thumbnails-size")[0].style = 'color: grey;';
+      row_col_scale_valid = true;
     }else{
       $("#thumbnails-size")[0].innerText = 'Invalid'
       $("#thumbnails-size")[0].style = 'color: red;';
+      row_col_scale_valid = false;
     }
   }
 }
@@ -123,9 +203,9 @@ function display_output_info(){
 function add_materials(material_info){
 
   material_info.forEach(function (item) {
-    var m_tr = '<tr>'+
-      '<td>' + item.path + '</td>'+
-      '<td>' + item.type +'</td>'+
+    var m_tr = '<tr class="material-tr">'+
+      '<td class="path-td">' + item.path + '</td>'+
+      '<td class="type-td">' + item.type +'</td>'+
       '<td>' + byte2string(item.size) +'</td>'+
       '<td><span class="remove"><button type="button" class="close remove-material" images_cnt="' + item.images_cnt + '" videos_cnt="' + item.videos_cnt + '"><span>&times;</span></button></span></td>'+
     '</tr>';
@@ -145,6 +225,42 @@ function add_materials(material_info){
     $("#image-count")[0].innerText = image_cnt;
     $("#video-count")[0].innerText = video_cnt;
   });
+}
+
+function update_status_from_core(msg) {
+
+  // ret: 0-> task completed, 1->running
+  $('#update-progress')[0].style.width = msg['progress'] + '%';
+  $('#update-progress')[0].innerHTML = msg['progress'] + '%';
+  if ($('#progress-status')[0].innerText.replace(/ \./g, '') != msg['display_status'].replace(/ \./g, '')){ // update display status
+    clearInterval(progress_status_interval);
+    $('#progress-status')[0].innerText = msg['display_status'].replace(/ \./g, '');
+    if (msg['display_status'].indexOf(' .') != -1){  // status . . .
+      $('#progress-status')[0].innerText += " .";
+      progress_status_interval = setInterval(function(){
+        var ui_status = $('#progress-status')[0].innerText;
+        var dot_pos = ui_status.indexOf(' .');
+        if (dot_pos <= ui_status.length-8){
+          $('#progress-status')[0].innerText = ui_status.replace(/ \./g, '');
+          $('#progress-status')[0].innerText += ' .';
+          console.log('1: ' + $('#progress-status')[0].innerText);
+        }else{
+          $('#progress-status')[0].innerText += ' .';
+          console.log('2: ' + $('#progress-status')[0].innerText);
+        }
+      }, 1000); 
+    }
+  }
+
+  if (msg['ret'] == 0){
+    $('#start-cancel-button')[0].innerText = 'Start';
+
+    if ($('#open-output').is(':checked')){
+      console.log(msg['output_path'])
+      ipc.send('navFile', msg['output_path']);
+    }
+  }
+
 }
 
 function byte2string(n){
