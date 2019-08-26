@@ -134,6 +134,10 @@ function validate_config(){
     err_msg = 'row, col or scale is invalid';
   }
 
+  if ($('.material-tr').length == 0){
+    err_msg = 'no material data found';
+  }
+
   if (err_msg) {
     $('#alert-dialog-content')[0].innerText = err_msg;
     $('#alert-dialog-hidden-btn').click();
@@ -144,9 +148,9 @@ function validate_config(){
     var args = {}
     args["input-image"] = $('#src-img-input')[0].value;
     args["output-path"] = $('#output-dir-input')[0].value;
-    args["row"] = parseInt($('#row-input')[0].value);
-    args["col"] = parseInt($('#col-input')[0].value);
-    args["scale"] = parseFloat($('#scale-input')[0].value);
+    args["row"] = parseInt($('#row-input')[0].value, 10);
+    args["col"] = parseInt($('#col-input')[0].value, 10);
+    args["scale"] = parseFloat($('#scale-input')[0].value, 10);
     args["material"] = [];
     $('.material-tr').each(function () {
       var path_td = $(this).children('.path-td')[0];
@@ -155,12 +159,12 @@ function validate_config(){
     });   
 
     args["no-thumbs"] =         $('#no-thumbs').is(':checked');
-    args["video-sampling-ms"] = parseInt($('#vs-input')[0].value);
+    args["video-sampling-ms"] = parseInt($('#vs-input')[0].value, 10);
     args["output-name"] =       $('#output-name-input')[0].value;
-    args["gap"] =               parseInt($('#gap-input')[0].value);
-    args["enhance-colors"] =    parseInt($('#ec-input')[0].value);
+    args["gap"] =               parseInt($('#gap-input')[0].value, 10);
+    args["enhance-colors"] =    parseInt($('#ec-input')[0].value, 10);
     args["tolerance"] =         parseFloat($('#tolerance-input')[0].value);
-    args["seed"] =              parseInt($('#seed-input')[0].value);
+    args["seed"] =              parseInt($('#seed-input')[0].value, 10);
 
     ipc.send('exeCore', args);
 
@@ -173,17 +177,17 @@ function display_output_info(){
   let output_size = null;
   if (src_img_size && $("#scale-input")[0].value){
     output_size = {};
-    output_size['width'] = src_img_size.width * parseInt($("#scale-input")[0].value);
-    output_size['height'] = src_img_size.height * parseInt($("#scale-input")[0].value);
+    output_size['width'] = src_img_size.width * parseInt($("#scale-input")[0].value, 10);
+    output_size['height'] = src_img_size.height * parseInt($("#scale-input")[0].value, 10);
     $("#output-size")[0].innerText = output_size['width'] + 'x' + output_size['height'];
   }
 
   let thumbnails_size = null;
   if (output_size && $("#row-input")[0].value && $("#col-input")[0].value){
-    if (output_size.width % parseInt($("#col-input")[0].value) == 0 && output_size.height % parseInt($("#row-input")[0].value) == 0){
+    if (output_size.width % parseInt($("#col-input")[0].value, 10) == 0 && output_size.height % parseInt($("#row-input")[0].value, 10) == 0){
       thumbnails_size = {};
-      thumbnails_size['width'] = output_size.width / parseInt($("#col-input")[0].value);
-      thumbnails_size['height'] = output_size.height / parseInt($("#row-input")[0].value);
+      thumbnails_size['width'] = output_size.width / parseInt($("#col-input")[0].value, 10);
+      thumbnails_size['height'] = output_size.height / parseInt($("#row-input")[0].value, 10);
     }
     if (thumbnails_size){
       $("#thumbnails-size")[0].innerText = thumbnails_size['width'] + 'x' + thumbnails_size['height'];
@@ -227,7 +231,7 @@ function add_materials(material_info){
 function update_status_from_core(msg) {
 
   // ret: 0-> task completed, 1->running, -1->exception
-  if (msg['ret'] == 0) {
+  if (msg['ret'] === 0) {
     $('#progress-status')[0].innerText = msg['display_status']
     $('#start-cancel-button')[0].innerText = 'Start';
     $('#update-progress')[0].style.width = '100%';
@@ -238,7 +242,7 @@ function update_status_from_core(msg) {
       ipc.send('navFile', msg['output_path']);
     }
 
-  } else if (msg['ret'] == 1){
+  } else if (msg['ret'] === 1){
     $('#update-progress')[0].style.width = msg['progress'] + '%';
     $('#update-progress')[0].innerHTML = msg['progress'] + '%';
     if ($('#progress-status')[0].innerText.replace(/ \./g, '') != msg['display_status'].replace(/ \./g, '')) { // update display status
@@ -258,7 +262,7 @@ function update_status_from_core(msg) {
         }, 1000);
       }
     }
-  } else if (msg['ret'] == -1) {
+  } else if (msg['ret'] === -1) {
 
     resetProgress();
     $('#alert-dialog-content')[0].innerText = msg['err_msg'];
