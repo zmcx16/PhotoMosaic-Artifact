@@ -80,10 +80,7 @@ $(document).ready(function () {
   });
 
   $('#check-dialog-ok-btn').click(function () {
-    $('#start-cancel-button')[0].innerText = 'Start';
-    $('#update-progress')[0].style.width = '0%';
-    $('#update-progress')[0].innerHTML = '0%';
-    $('#progress-status')[0].innerText = 'Ready';
+    resetProgress();
     ipc.send('killCore');
     $(".check-dialog-close").trigger("click");
   });
@@ -229,38 +226,55 @@ function add_materials(material_info){
 
 function update_status_from_core(msg) {
 
-  // ret: 0-> task completed, 1->running
-  $('#update-progress')[0].style.width = msg['progress'] + '%';
-  $('#update-progress')[0].innerHTML = msg['progress'] + '%';
-  if ($('#progress-status')[0].innerText.replace(/ \./g, '') != msg['display_status'].replace(/ \./g, '')){ // update display status
-    clearInterval(progress_status_interval);
-    $('#progress-status')[0].innerText = msg['display_status'].replace(/ \./g, '');
-    if (msg['display_status'].indexOf(' .') != -1){  // status . . .
-      $('#progress-status')[0].innerText += " .";
-      progress_status_interval = setInterval(function(){
-        var ui_status = $('#progress-status')[0].innerText;
-        var dot_pos = ui_status.indexOf(' .');
-        if (dot_pos <= ui_status.length-8){
-          $('#progress-status')[0].innerText = ui_status.replace(/ \./g, '');
-          $('#progress-status')[0].innerText += ' .';
-          console.log('1: ' + $('#progress-status')[0].innerText);
-        }else{
-          $('#progress-status')[0].innerText += ' .';
-          console.log('2: ' + $('#progress-status')[0].innerText);
-        }
-      }, 1000); 
-    }
-  }
-
-  if (msg['ret'] == 0){
+  // ret: 0-> task completed, 1->running, -1->exception
+  if (msg['ret'] == 0) {
+    $('#progress-status')[0].innerText = msg['display_status']
     $('#start-cancel-button')[0].innerText = 'Start';
+    $('#update-progress')[0].style.width = '100%';
+    $('#update-progress')[0].innerHTML = '100%';
 
-    if ($('#open-output').is(':checked')){
+    if ($('#open-output').is(':checked')) {
       console.log(msg['output_path'])
       ipc.send('navFile', msg['output_path']);
     }
+
+  } else if (msg['ret'] == 1){
+    $('#update-progress')[0].style.width = msg['progress'] + '%';
+    $('#update-progress')[0].innerHTML = msg['progress'] + '%';
+    if ($('#progress-status')[0].innerText.replace(/ \./g, '') != msg['display_status'].replace(/ \./g, '')) { // update display status
+      clearInterval(progress_status_interval);
+      $('#progress-status')[0].innerText = msg['display_status'].replace(/ \./g, '');
+      if (msg['display_status'].indexOf(' .') != -1) {  // status . . .
+        $('#progress-status')[0].innerText += " .";
+        progress_status_interval = setInterval(function () {
+          var ui_status = $('#progress-status')[0].innerText;
+          var dot_pos = ui_status.indexOf(' .');
+          if (dot_pos <= ui_status.length - 8) {
+            $('#progress-status')[0].innerText = ui_status.replace(/ \./g, '');
+            $('#progress-status')[0].innerText += ' .';
+          } else {
+            $('#progress-status')[0].innerText += ' .';
+          }
+        }, 1000);
+      }
+    }
+  } else if (msg['ret'] == -1) {
+
+    resetProgress();
+    $('#alert-dialog-content')[0].innerText = msg['err_msg'];
+    $('#alert-dialog-hidden-btn').click();
+    ipc.send('killCore');
   }
 
+}
+
+function resetProgress(){
+  $('#start-cancel-button')[0].innerText = 'Start';
+  $('#update-progress')[0].style.width = '0%';
+  $('#update-progress')[0].innerHTML = '0%';
+
+  clearInterval(progress_status_interval);
+  $('#progress-status')[0].innerText = 'Ready';
 }
 
 function byte2string(n){

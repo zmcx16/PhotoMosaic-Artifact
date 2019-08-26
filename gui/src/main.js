@@ -17,7 +17,6 @@ const image_sizeOf = require('image-size');
 const child_process = require('child_process');
 const detect_port = require('detect-port');
 
-let appIcon = null;
 let mainWindow = null;
 
 let port = -1;
@@ -124,11 +123,11 @@ ipc.on('exeCore', (event, args) => {
     } else if (platform == 'linux') {
       script = path.join(__dirname, 'core-linux', 'photomosaic-core');
     }
-    console.log(script);
+    //console.log(script);
     core_proc = child_process.execFile(script, ['-tool-args', JSON.stringify(args)]);
 
   } else {
-    console.log(args);
+    //console.log(args);
     core_proc = child_process.spawn('python', [script, '-tool-args', JSON.stringify(args)]);
   }
 });
@@ -168,7 +167,7 @@ ipc.on('getImagesAndVideosInfo', (event, isFolder) => {
 
   const { dialog } = require('electron');
   const images_filter_list = ['png', 'bmp', 'jpg', 'gif'];
-  const videos_filter_list = ['mp4', 'mkv', 'avi'];
+  const videos_filter_list = ['mp4', 'mkv', 'mpg', 'avi'];
   const filter_list = images_filter_list.concat(videos_filter_list);
   
   var material_list = [];
