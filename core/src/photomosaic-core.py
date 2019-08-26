@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import math
-import json
 import argparse
 import hashlib
 from timeit import default_timer as timer
@@ -104,9 +103,6 @@ class PhotoMosaicCore(object):
         self.col = tool_args["col"]
         self.scale = tool_args["scale"]
 
-        with open('tool_args_str1.data', 'w') as file:
-            file.write(tool_args_str)
-
         self.video_sampling_ms = tool_args["video-sampling-ms"]
         self.gen_thumbs = not tool_args["no-thumbs"]
         self.output_path = tool_args["output-path"]
@@ -121,15 +117,19 @@ class PhotoMosaicCore(object):
 
     def generate_mosaic(self):
 
-        start = timer()
+        try:
+            start = timer()
+            self.__prepare()
+            self.__generate()
+            end = timer()
 
-        self.__prepare()
-        self.__generate()
+            print()
+            print('Task Completed, Execution Time: {0}'.format(timedelta(seconds=end - start)))
+            self.__send_status2tool(0, 100, 'Mission Completed')
 
-        end = timer()
-        print()
-        print('Task Completed, Execution Time: {0}'.format(timedelta(seconds=end - start)))
-        self.__send_status2tool(0, 100, 'Mission Completed')
+        except Exception as e:
+            print('Exception: ', e)
+            self.__send_status2tool(-1, 0, '', 'core throw exception: {0}'.format(e))
 
     def __prepare(self):
 
@@ -267,6 +267,7 @@ class PhotoMosaicCore(object):
                 self.__img2thumbnail(Image.open(file))
             elif (sub_ext.lower().endswith('.mkv') or
                     sub_ext.lower().endswith('.avi') or
+                    sub_ext.lower().endswith('.mpg') or
                     sub_ext.lower().endswith('.mp4')):
                 self.__gen_thumbs_from_videos(file, display_progress)
 
@@ -414,10 +415,10 @@ class PhotoMosaicCore(object):
         self.matrix[coordy][coordx] = tgt_file_name
         return tgt_file_name
 
-    def __send_status2tool(self, ret, progress, display_status):
+    def __send_status2tool(self, ret, progress, display_status, err_msg=''):
         # ret: 0-> task completed, 1->running
         if self.ipc_mode:
-            msg = {'ret': ret, 'progress': progress, 'display_status': display_status}
+            msg = {'ret': ret, 'progress': progress, 'display_status': display_status, 'err_msg': err_msg}
             if ret == 0:
                 msg['output_path'] = self.output_tgt_path
             self.client.status(msg)
