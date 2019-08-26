@@ -184,7 +184,7 @@ function display_output_info(){
 
   let thumbnails_size = null;
   if (output_size && $("#row-input")[0].value && $("#col-input")[0].value){
-    if (output_size.width % parseInt($("#col-input")[0].value, 10) == 0 && output_size.height % parseInt($("#row-input")[0].value, 10) == 0){
+    if (output_size.width % parseInt($("#col-input")[0].value, 10) === 0 && output_size.height % parseInt($("#row-input")[0].value, 10) === 0){
       thumbnails_size = {};
       thumbnails_size['width'] = output_size.width / parseInt($("#col-input")[0].value, 10);
       thumbnails_size['height'] = output_size.height / parseInt($("#row-input")[0].value, 10);
@@ -284,14 +284,14 @@ function resetProgress(){
 function byte2string(n){
   if (n==0)
     return '';
-  else if (n < 1000)
+  else if (n < 1e3)
     return n + ' B';
-  else if (n < 1000000)
-    return (n / 1000).toFixed(1) + ' KB';
-  else if (n < 1000000000)
+  else if (n < 1e6)
+    return (n / 1e3).toFixed(1) + ' KB';
+  else if (n < 1e9)
     return (n / 1000000).toFixed(1) + ' MB';
   else
-    return (n / 1000000000).toFixed(1) + ' GB';
+    return (n / 1e9).toFixed(1) + ' GB';
 }
 
 function auto_calc_config(){
@@ -338,7 +338,7 @@ function get_all_factors(n){
   var i = 1;
   for (i = 1; i <= n; i++)
   {
-    if (n % i == 0) {
+    if (n % i === 0) {
       factors.push(i);
     }
   } 
