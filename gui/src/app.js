@@ -239,7 +239,7 @@ function update_status_from_core(msg) {
 
     if ($('#open-output').is(':checked')) {
       console.log(msg['output_path'])
-      ipc.send('navFile', msg['output_path']);
+      ipc.send('navExec', msg['output_path']);
     }
 
   } else if (msg['ret'] === 1){

@@ -18,6 +18,7 @@ const child_process = require('child_process');
 const detect_port = require('detect-port');
 
 let mainWindow = null;
+let aboutWindow = null;
 
 let port = -1;
 let core_proc = null;
@@ -30,7 +31,24 @@ const menu_template = [
     submenu: [
       { 
         label: 'About PhotoMosaic-Artifact',
-        click: () => {}
+        click: () => {
+          if (!aboutWindow) {
+            console.log('open about Window');
+            aboutWindow = new BrowserWindow({
+              icon: path.join(__dirname, 'PhotoMosaic-Artifact.png'),
+              webPreferences: {
+                nodeIntegration: true
+              },
+              width: 640, height: 320
+            });
+
+            aboutWindow.loadURL(`file://${__dirname}/about.html`);
+            aboutWindow.on('closed', () => {
+              aboutWindow = null
+            })
+            aboutWindow.removeMenu()
+          }
+        }
       },
       {
         label: 'Debug Console',
@@ -136,13 +154,13 @@ ipc.on('killCore', () => {
   killCore();
 });
 
-ipc.on('navFile', (event, file) => {
+ipc.on('navExec', (event, target) => {
   if (platform == 'win32') {
-    child_process.execSync('start ' + file);
+    child_process.execSync('start ' + target);
   } else if (platform == 'darwin') {
-    child_process.execSync('open ' + file);
+    child_process.execSync('open ' + target);
   } else if (platform == 'linux') {
-    child_process.execSync('xdg-open ' + file);
+    child_process.execSync('xdg-open ' + target);
   }
 });
 
