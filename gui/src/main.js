@@ -93,7 +93,7 @@ app.on('ready', () => {
     mainWindow.webContents.on('dom-ready', () => {
   });
 
-  // core process
+  // for core process
   let port_candidate = 7777;
   detect_port(port_candidate, (err, _port) => {
     if (err) {
@@ -114,6 +114,7 @@ app.on('ready', () => {
 app.on('will-quit', () => {
   killCore();
 });
+// -------------------------------
 
 // ipc register
 ipc.on('getPort', (event) => {
@@ -128,7 +129,13 @@ ipc.on('getPortSync', (event) => {
 ipc.on('exeCore', (event, args) => {
 
   args['port'] = port.toString();
-  args['root_path'] = root_path;
+
+  if (platform == 'linux') {
+    const homedir = os.homedir();
+    args['root_path'] = path.join(homedir, '.PhotoMosaic-Artifact');
+  } else {
+    args['root_path'] = root_path;
+  }
 
   console.log('dir path:' + __dirname);
   console.log('platform:' + platform);
@@ -237,18 +244,7 @@ ipc.on('getImagesAndVideosInfo', (event, isFolder) => {
   event.returnValue = material_list;
   
 });
-
-function quitAll(){
-  app.quit();
-  app.exit(0);
-}
-
-function killCore(){
-  console.log('kill core process');
-  if (core_proc)
-    core_proc.kill();
-  core_proc = null;
-}
+// ----------------------------------
 
 // common function
 function walkSync(dir, filelist) {
@@ -267,7 +263,6 @@ function walkSync(dir, filelist) {
 }
 
 function type_check(file_path, filter){
-
   var ret = false;
   filter.some(function (ext) {
     if (file_path.toLowerCase().indexOf(ext.toLowerCase()) == file_path.length - ext.length) {
@@ -279,4 +274,16 @@ function type_check(file_path, filter){
   });
 
   return ret;
+}
+
+function quitAll() {
+  app.quit();
+  app.exit(0);
+}
+
+function killCore() {
+  console.log('kill core process');
+  if (core_proc)
+    core_proc.kill();
+  core_proc = null;
 }
