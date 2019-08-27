@@ -8,6 +8,7 @@ from timeit import default_timer as timer
 from datetime import timedelta
 import random
 import json
+import traceback
 
 from PIL import Image
 import numpy as np
@@ -127,9 +128,9 @@ class PhotoMosaicCore(object):
             print('Task Completed, Execution Time: {0}'.format(timedelta(seconds=end - start)))
             self.__send_status2tool(0, 100, 'Mission Completed')
 
-        except Exception as e:
-            print('Exception: ', e)
-            self.__send_status2tool(-1, 0, '', 'core throw exception: {0}'.format(e))
+        except:
+            print('Exception: ', traceback.format_exc())
+            self.__send_status2tool(-1, 0, '', 'core throw exception:\n{0}'.format(traceback.format_exc()))
 
     def __prepare(self):
 
@@ -386,14 +387,14 @@ class PhotoMosaicCore(object):
         index = 0
         if self.tolerance != 0:
             for info in sorted_info:
-                if info[1] <= self.tolerance:
+                if info[1] <= self.tolerance and index < len(sorted_info)-1:
                     index += 1
 
             if index != 0:
                 index = random.randrange(index)
 
         suitable = False
-        while not suitable:
+        while not suitable and index < len(sorted_info):
 
             suitable = True
             tgt_file_name = sorted_info[index][0]
