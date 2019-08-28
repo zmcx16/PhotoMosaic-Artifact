@@ -9,7 +9,7 @@ Besides, I also make some interesting features on this tool, I hope the PhotoMos
 # Features
 1. Make the custom photographic mosaic image
 2. Support video material
-3. Support GUI tool (TODO)
+3. Support GUI tool
 
 
 # Support Platform 
@@ -27,7 +27,7 @@ Besides, I also make some interesting features on this tool, I hope the PhotoMos
   *  numpy>=1.17.0
   *  opencv-python>=4.1.0.25
 
-# Usage
+# Usage for command (photomosaic-core)
 1. Copy your material image files into material folder
 2. Follow below command line:
 ```
@@ -53,6 +53,11 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 # Note
 1. The output image size (input image size * scale) must be divisible by row and col, the width must divisible by column; the height must divisible by row.
 2. The thumbnail image size = (input-image's width * scale / col, input-image's height * scale / row), if the aspect ratio of images in the material folder is different from the thumbnail, the image will be cropped to fit the aspect ratio of the thumbnail.
+
+# GUI tool
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/demo.png)
+
 
 
 # Demo sample1 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1.jpg))

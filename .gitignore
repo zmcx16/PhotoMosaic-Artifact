@@ -8,3 +8,5 @@
 /core/src/thumbs_info.json
 /core/src/temp
 /gui/src/node_modules
+/gui/src/dist
+/gui/src/core-win
