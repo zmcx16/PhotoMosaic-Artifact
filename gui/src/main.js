@@ -114,7 +114,6 @@ app.on('ready', () => {
 app.on('will-quit', () => {
   killCore();
 });
-// -------------------------------
 
 // ipc register
 ipc.on('getPort', (event) => {
@@ -137,8 +136,7 @@ ipc.on('exeCore', (event, args) => {
     args['root_path'] = root_path;
   }
 
-  console.log('dir path:' + __dirname);
-  console.log('platform:' + platform);
+  console.log('platform:' + platform, ', dir path:' + __dirname);
   let script = path.join(path.resolve(__dirname, '..', '..'), 'core', 'src', 'photomosaic-core.py');
   if (!fs.existsSync(script)) {
     if (platform == 'win32') {
@@ -148,11 +146,9 @@ ipc.on('exeCore', (event, args) => {
     } else if (platform == 'linux') {
       script = path.join(__dirname, 'core-linux', 'photomosaic-core');
     }
-    //console.log(script);
     core_proc = child_process.execFile(script, ['-tool-args', JSON.stringify(args)]);
 
   } else {
-    //console.log(args);
     core_proc = child_process.spawn('python', [script, '-tool-args', JSON.stringify(args)]);
   }
 });
@@ -244,7 +240,6 @@ ipc.on('getImagesAndVideosInfo', (event, isFolder) => {
   event.returnValue = material_list;
   
 });
-// ----------------------------------
 
 // common function
 function walkSync(dir, filelist) {

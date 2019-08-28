@@ -23,7 +23,6 @@ ipc.on('getPort_callback', (event, port) => {
     server_port = port;
     server = new zerorpc.Server({
       status: function (msg, reply) {
-        //console.log(msg);
         update_status_from_core(msg);
         reply(null, "");
       }
@@ -47,7 +46,6 @@ ipc.on('getImageSize_callback', (event, dimensions) => {
 // OnStart
 $(document).ready(function () {
 
-  // get port
   ipc.send('getPort');
 
   // register event

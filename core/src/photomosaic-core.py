@@ -231,8 +231,8 @@ class PhotoMosaicCore(object):
             try:
                 if os.path.isfile(file_path):
                     os.unlink(file_path)
-            except Exception as e:
-                print(e)
+            except:
+                print('Exception: ', traceback.format_exc())
 
         material_list = []
 
@@ -251,7 +251,7 @@ class PhotoMosaicCore(object):
                     material_list.append(os.path.join(root, f))
 
         if len(material_list) == 0:
-            raise Exception('No photos to process in ', self.material)
+            raise Exception('No photos or images to process in ', self.material)
 
         display_progress = 0
         sys.stdout.write("\rprogress: {:.0f}%".format(display_progress))
@@ -301,8 +301,8 @@ class PhotoMosaicCore(object):
                 offset = random.randrange(step)
                 video.set(cv2.CAP_PROP_POS_FRAMES, i - offset)
                 video.grab()
-            except Exception as e:
-                print(e)
+            except:
+                print('Exception: ', traceback.format_exc())
 
             ret, frame = video.read()
             if not ret:
@@ -322,7 +322,6 @@ class PhotoMosaicCore(object):
         sys.stdout.write("\rprogress: {:.0f}% [{:.0f}%]     ".format(progress, 100))
         self.__send_status2tool(1, progress, '')
         video.release()
-
 
     def __img2thumbnail(self, img):
         region = self.__get_crop_region(img.size[0], img.size[1], self.cell['width'], self.cell['height'])
