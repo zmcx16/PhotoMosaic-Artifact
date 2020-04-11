@@ -132,7 +132,7 @@ function validate_config(){
     err_msg = 'row, col or scale is invalid';
   }
 
-  if ($('.material-tr').length == 0){
+  if ($('.material-tr').length === 0){
     err_msg = 'no material data found';
   }
 
@@ -280,7 +280,7 @@ function resetProgress(){
 }
 
 function byte2string(n){
-  if (n==0)
+  if (n===0)
     return '';
   else if (n < 1e3)
     return n + ' B';
