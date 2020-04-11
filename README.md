@@ -60,7 +60,7 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample1 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1.jpg))
+# Demo sample1 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1.jpg?raw=true))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample1.jpg)
@@ -69,7 +69,7 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample2 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output2.jpg))
+# Demo sample2 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output2.jpg?raw=true))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample2.jpg)
@@ -78,7 +78,7 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample3 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output3.jpg))
+# Demo sample3 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output3.jpg?raw=true))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample3.jpg)
@@ -87,7 +87,7 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample4 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output4.jpg))
+# Demo sample4 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output4.jpg?raw=true))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample4.jpg)
