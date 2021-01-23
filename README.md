@@ -60,7 +60,7 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample1 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output1.jpg?raw=true))
+# Demo sample1 ([Org output img](https://drive.google.com/uc?export=download&id=118zrAbsja_ycrM3nzqEWOH67S7eNYRbI))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample1.jpg)
@@ -69,7 +69,7 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample2 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output2.jpg?raw=true))
+# Demo sample2 ([Org output img](https://drive.google.com/uc?export=download&id=1FqTAZ-qlMXydu8WFLeYexVNTKZj-xsUu))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample2.jpg)
@@ -78,7 +78,7 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample3 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output3.jpg?raw=true))
+# Demo sample3 ([Org output img](https://drive.google.com/uc?export=download&id=1wWA_jp5CnLEc_3D5NuNtv-hfNah8aiZW))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample3.jpg)
@@ -87,12 +87,39 @@ photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 
 
-# Demo sample4 ([Org output img](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output4.jpg?raw=true))
+# Demo sample4 ([Org output img](https://drive.google.com/uc?export=download&id=1wHNtR0XJ3mz6I0BIwm-u_HdNnZNIR6yG))
 
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample4.jpg)
 
 ![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output4-demo.jpg)
+
+
+
+# Demo sample5 ([Org output img](https://drive.google.com/uc?export=download&id=1Xj4xoLshYQGh3gC5_owcCIMm2-00EYrQ))
+
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample5.jpg)
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output5-demo.jpg)
+
+
+
+# Demo sample6 ([Org output img](https://drive.google.com/uc?export=download&id=1r9m3zX31JVCOsKTttcxg8EBeoMgU5DLB))
+
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample6.png)
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output6-demo.jpg)
+
+
+
+# Demo sample7 ([Org output img](https://drive.google.com/uc?export=download&id=1qk9WEJH3FlrVTLmPUDokADW1Rq4sOwtf))
+
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/sample7.jpg)
+
+![image](https://github.com/zmcx16/PhotoMosaic-Artifact/blob/master/examples/output7-demo.jpg)
 
 
 # Reference
