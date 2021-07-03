@@ -2,7 +2,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/36e620704dc7489c84be7dfe0b8b1f10)](https://www.codacy.com/app/zmcx16/PhotoMosaic-Artifact?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zmcx16/PhotoMosaic-Artifact&amp;utm_campaign=Badge_Grade)
 
 # Concept
-The photo mosaic algorithm is based on [eflorit / mosaic-generator (php)](https://https://github.com/eflorit/mosaic-generator) and implements it on python language. 
+The photo mosaic algorithm is based on [eflorit / mosaic-generator (php)](https://github.com/eflorit/mosaic-generator) and implements it on python language. 
 
 Besides, I also make some interesting features on this tool, I hope the PhotoMosaic-Artifact can help you to make some amazing & exciting photos :) 
 
