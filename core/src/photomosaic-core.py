@@ -441,8 +441,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "-input-image", dest="img", default="", help="input image path")
-    parser.add_argument("-r", "-row", dest="row", default=0, help="number of thumbnails to create per row")
-    parser.add_argument("-c", "-col", dest="col", default=0, help="number of thumbnails to create per col")
+    parser.add_argument("-r", "-row", dest="row", default=0, help="number of rows in output image")
+    parser.add_argument("-c", "-col", dest="col", default=0, help="number of columns in output image")
     parser.add_argument("-m", "-material", dest="material", default="", help="material folder path")
     parser.add_argument("-s", "-scale", dest="scale", default=1.0, help="output image size = input image size * scale")
     parser.add_argument("-vs", "-video-sampling-ms", dest="video_sampling_ms", default=5000, help="sampling video image interval (ms)")
