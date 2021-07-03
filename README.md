@@ -36,8 +36,8 @@ or
 photomosaic-core.exe -i sample.jpg -r 145 -c 100 -s 10
 
 -i                                      path to the original picture that shall be recreated
--r                                      number of thumbnails to create per row
--c                                      number of thumbnails to create per column
+-r                                      number of rows in output image
+-c                                      number of columns in output image
 -m          (default = ".\material")    path to the material folder
 -s          (default = 1)               output image size = input image size * scale
 -vs         (default = 5000)            sampling video image interval (ms), only need be set if the material include video files
